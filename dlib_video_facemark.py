@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 from imutils import face_utils
 
-predictor_path = "./data/shape_predictor_68_face_landmarks.dat"
+predictor_path = "../data/shape_predictor_68_face_landmarks.dat"
 
 detector = dlib.get_frontal_face_detector()
 cam = cv2.VideoCapture(0)
@@ -38,12 +38,26 @@ while True:
                                                   shape.part(1)))
 
         shape = face_utils.shape_to_np(shape)
+        face_bb = cv2.boundingRect(shape)
+        print("face", face_bb)
+        eye1_bb = cv2.boundingRect(shape[36: 41])
+        eye2_bb = cv2.boundingRect(shape[42: 47])
+        print("left eye",eye1_bb)
+        print("right eye", eye2_bb)
+        eye1_frame = img[eye1_bb[1]: eye1_bb[1]+eye1_bb[3], eye1_bb[0]:eye1_bb[0] + eye1_bb[2]]
+        eye1_frame = cv2.resize(eye1_frame, (eye1_frame.shape[1]*2, eye1_frame.shape[0]*2))
+        eye2_frame = img[eye2_bb[1]: eye2_bb[1]+eye2_bb[3], eye2_bb[0]:eye2_bb[0] + eye2_bb[2]]
+        eye2_frame = cv2.resize(eye2_frame, (eye2_frame.shape[1]*2, eye2_frame.shape[0]*2))
+        cv2.imshow("eye1", eye1_frame)
+        cv2.imshow("eye2", eye2_frame)
         # cv2.polylines(img, [shape], True, color_green, 4, 4)
 
         for (x, y) in shape:
             cv2.circle(img, (x, y), 2, (0, 0, 255), -1)
 
     cv2.imshow("Image", img)
+
+
     # for det in dets:
     #     cv2.rectangle(img,(det.left(), det.top()), (det.right(), det.bottom()), color_green, line_width)
     # cv2.imshow('my webcam', img)
