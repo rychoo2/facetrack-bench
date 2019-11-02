@@ -5,6 +5,7 @@ import glob
 import cv2
 import numpy as np
 from imutils import face_utils
+from eye_landmark import detect_pupil
 
 predictor_path = "../data/shape_predictor_68_face_landmarks.dat"
 eyes_cascade_path = '../data/haarcascades/haarcascade_eye_tree_eyeglasses.xml'
@@ -47,9 +48,14 @@ while True:
         # cv2.imshow("face2", faceROI2)
 
         for (eye_name, eye_bb) in [('eye_right', cv2.boundingRect(shape[36: 41])), ('eye_left', cv2.boundingRect(shape[42: 47]))]:
+
             eye1_frame = frame_final[eye_bb[1] -  int(0.8*eye_bb[3]): eye_bb[1]+int(1.8*eye_bb[3]), eye_bb[0] - int(0.8*eye_bb[2]):eye_bb[0] + int(1.8*eye_bb[2])]
+            eye1_frame = cv2.cvtColor(eye1_frame, cv2.COLOR_GRAY2RGB)
+            pupil = detect_pupil(eye1_frame)
+            if pupil:
+                cv2.circle(eye1_frame, (round(pupil.pt[0]), round(pupil.pt[1])), 1, (0, 0, 255), 1)
+
             eye1_frame = cv2.pyrUp(eye1_frame)
-            eye1_frame = cv2.equalizeHist(eye1_frame)
             cv2.imshow(eye_name, eye1_frame)
 
         for (x, y) in shape:

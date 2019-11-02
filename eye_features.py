@@ -2,6 +2,7 @@ import random
 
 import cv2
 import numpy as np
+from eye_landmark import detect_pupil
 
 kernel = np.ones((5,5), np.uint8)
 params = cv2.SimpleBlobDetector_Params()
@@ -51,25 +52,14 @@ def detect_circle(img):
             cv2.circle(im, (i[0], i[1]), 2, (0, 255, 0), 5)
     return im
 
-def detect_pupil(img):
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    img = cv2.GaussianBlur(img, (5,5), 0)
-    img = cv2.equalizeHist(img)
-    img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY)[1]
-    keypoints = detector.detect(img)
-    print(keypoints)
-    if len(keypoints) > 0:
-        keypoints.sort(key=lambda s: s.size, reverse=True)
-        return keypoints[0]
-    else:
-        return None
+
 
 def draw_pupil(img):
     im = img.copy()
     keypoint = detect_pupil(img)
     if keypoint:
         print(keypoint.pt)
-        cv2.circle(im, (round(keypoint.pt[0]), round(keypoint.pt[1])), 1, (0, 0, 255), 1)
+        cv2.circle(im, (round(keypoint.pt[0]), round(keypoint.pt[1])), 1, (0, 0, 255), 2)
     return im
 
 
