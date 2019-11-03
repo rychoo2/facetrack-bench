@@ -94,7 +94,7 @@ def imggrid(vrow):
     return np.hstack((np.vstack(tuple(row)) for row in imggrid_3d))
 
 
-for image_file in ['./images/eye3.png', './images/eye4.png']:
+for image_file in ['./images/eye5.png', './images/eye6.png']:
     eyeimg = cv2.imread(image_file)
     # cv2.circle(eyeimg, (50, 50), 5, (255, 0,0 ), 3)
     eyeimg2 = cv2.GaussianBlur(eyeimg, (5,5), 0)
@@ -112,6 +112,7 @@ for image_file in ['./images/eye3.png', './images/eye4.png']:
                    # cv2.threshold(eyeimg_final, 50, 255, cv2.THRESH_BINARY)[1],
                    cv2.threshold(eyeimg_final, 0, 255, cv2.THRESH_BINARY)[1],
                    cv2.threshold(eyeimg_final, 1, 255, cv2.THRESH_BINARY)[1],
+                   cv2.threshold(eyeimg_final, 5, 255, cv2.THRESH_BINARY)[1],
                    cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
                                                       cv2.THRESH_BINARY, 5, 0), cv2.COLOR_GRAY2RGB),
                    cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
