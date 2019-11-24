@@ -2,7 +2,7 @@ import random
 
 import cv2
 import numpy as np
-from eye_landmark import detect_pupil
+from libs.eye_landmark import detect_pupil
 
 kernel = np.ones((5,5), np.uint8)
 params = cv2.SimpleBlobDetector_Params()
