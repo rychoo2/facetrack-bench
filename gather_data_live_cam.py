@@ -25,10 +25,10 @@ def on_click(x, y, button, pressed):
         'Pressed' if pressed else 'Released',
         (x, y), timestamp))
     ret_val, img = cam.read()
-    image_path = "{}/images/{}.jpg".format(output, timestamp)
+    image_path = "images/{}.jpg".format(timestamp)
     fw.write("{},{},{}\n".format(x, y, image_path))
     fw.flush()
-    cv2.imwrite(image_path, img)
+    cv2.imwrite("{}/{}".format(output, image_path), img)
 
 with mouse.Listener(
         on_move=on_move,
