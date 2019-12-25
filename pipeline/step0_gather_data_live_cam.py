@@ -11,7 +11,7 @@ cam = cv2.VideoCapture(0)
 mouse_ctrl = mouse.Controller()
 now = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
-output = 'train_data/raw/{}'.format(now)
+output = '../train_data/raw/{}'.format(now)
 os.makedirs(output+'/images')
 fw = open('{}/positions.csv'.format(output), 'w')
 
