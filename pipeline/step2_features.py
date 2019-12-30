@@ -3,7 +3,7 @@ import os
 import glob
 import cv2
 from libs.face import get_faces
-from libs.utils import get_timestamp, get_last_landmarks
+from libs.utils import get_timestamp, get_latest_landmarks
 import pandas as pd
 
 train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data"
@@ -40,7 +40,7 @@ def generate_features(raw_path, landmark_path, output_path):
                                     ])
 
 def generate_features_for_datasets(input_root, output_root):
-    for (dirname, landmark_path) in get_last_landmarks(input_root):
+    for (dirname, landmark_path) in get_latest_landmarks(input_root):
         generate_features("{}/raw/{}/positions.csv".format(input_root, dirname),
                           "{}/landmarks.csv".format(landmark_path),
                           "{}/{}".format(output_root, dirname))
