@@ -1,0 +1,10 @@
+dataset,model,score
+capture1,CenterOfScreenModel,0.2147869773256329
+capture1,NNSequentialKerasBasic,0.20234901705582142
+capture1,NNSequentialKerasBasic0,0.21366445134988338
+capture0,CenterOfScreenModel,0.2903654921246609
+capture0,NNSequentialKerasBasic,0.26794476571921055
+capture0,NNSequentialKerasBasic0,0.2890152167134458
+overall,CenterOfScreenModel,0.2504168485880318
+overall,NNSequentialKerasBasic,0.23990601392650096
+overall,NNSequentialKerasBasic0,0.2524107645804184
