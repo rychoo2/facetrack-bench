@@ -1,54 +1,48 @@
 from keras.models import Sequential
 import pandas as pd
 import numpy as np
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 from keras.layers import Dense
 import keras
 from keras import metrics
 
+from pipeline.models.center_of_screen_model import CenterOfScreenModel
+from pipeline.models import ModelBase
+from pipeline.models import NNSequentialKeras
+
 model = Sequential()
-model.add(Dense(100, activation='linear', input_dim=2))
-model.add(Dense(64, activation='linear'))
-model.add(Dense(32, activation='linear'))
+model.add(Dense(12, activation='linear', input_dim=12))
 model.add(Dense(2, activation='linear'))
 
 model.compile(optimizer='sgd',
               loss='mean_squared_error',
               metrics=[ metrics.mae])
 
-# Generate dummy data
-import numpy as np
+models = [CenterOfScreenModel(), NNSequentialKeras()]
 
-data = pd.read_csv('../train_data/features/20191228150658055/headstill1/features.csv')
+data = pd.read_csv('../train_data/features/20191230104532257/headstill1/features.csv')
+data.dropna(subset=['rel_target_x','rel_target_y'], inplace=True)
+# data.dropna(inplace=True)
+data.fillna(0.5, inplace=True)
+input = data[['rel_face_x','rel_face_y','rel_face_size_x','rel_face_size_y','rel_pose_x','rel_pose_y',
+              'rel_eye_distance_x','rel_eye_distance_y','rel_left_pupil_x','rel_left_pupil_y','rel_right_pupil_x',
+              'rel_right_pupil_y']]
+target = data[['rel_target_x', 'rel_target_y']]
 
-print(data)
+result = []
 
-# data = np.random.random((10, 2))
-data = np.array([[0.1, 0.2],
-                 [0.4, 0.3],
-                 [0.5, 0.1],
-                 [0.1, 0.2],
-                 [0.4, 0.3],
-                 [0.5, 0.1]
-                 ])
+for model in models:
+    model.train(input, target)
+    output = model.predict(input)
+    benchmark = model.evaluate(output, target)
+    result.append([model.name, 'headstill1', benchmark])
 
-# labels = np.random.randint(10, size=(1000, 2))
-labels = np.array([[0.2, 0.4],
-                  [0.8, 0.6],
-                  [1, 0.2],
-                   [0.2, 0.4],
-                   [0.8, 0.6],
-                   [1, 0.2]
-                   ])
-#
-# print(labels)
+output = model.predict(input)
+pp.pprint(result)
 
-# Train the model, iterating on the data in batches of 32 samples
-model.fit(data, labels, epochs=100)
-
-output = model.predict(data)
-
-print(np.array(list(zip(data,output))))
-
-output2 = model.evaluate(data, labels)
-print(output2)
+# print(input)
+# print(output)
+# print(target)
+# # print(np.array(list(zip(output, target))))

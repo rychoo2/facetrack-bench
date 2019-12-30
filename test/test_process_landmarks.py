@@ -13,7 +13,7 @@ class TestProcess_landmarks(TestCase):
 
     def test_process_landmarks(self):
         start = time.process_time()
-        generate_landmarks_for_datasets("data/raw", self.test_output_path)
+        generate_landmarks_for_datasets("data", self.test_output_path)
         duration = time.process_time() - start
 
         # should have 2 datasets

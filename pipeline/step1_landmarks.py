@@ -3,7 +3,7 @@ import os
 import glob
 import cv2
 from libs.face import get_faces
-from libs.utils import get_timestamp
+from libs.utils import get_timestamp, get_datasets
 
 train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data"
 
@@ -54,12 +54,12 @@ def process_landmarks(input_path, output_path):
 
 
 def generate_landmarks_for_datasets(input_root, output_root):
-    for dirname in os.listdir(input_root):
-        process_landmarks("{}/{}".format(input_root, dirname), "{}/{}".format(output_root, dirname))
+    for dirname, path in get_datasets(input_root):
+        process_landmarks(path, "{}/{}".format(output_root, dirname))
+
 
 if __name__ == '__main__':
-    raw_input_path = "{}/raw".format(train_data_dir)
     now = get_timestamp()
     output_path = "{}/landmarks/{}".format(train_data_dir, now)
-    generate_landmarks_for_datasets(raw_input_path, output_path)
+    generate_landmarks_for_datasets(train_data_dir, output_path)
 
