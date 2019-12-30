@@ -14,6 +14,8 @@ def generate_features(raw_path, landmark_path, output_path):
     landmark_df = pd.read_csv(landmark_path)
     df = landmark_df.set_index('filename').join(raw_df.set_index('filename'), on='filename')
     os.makedirs(output_path)
+    df['landmark_path'] = os.path.relpath(landmark_path)
+    df['raw_path'] = os.path.relpath(raw_path)
     df['rel_target_x'] = df.gaze_x/df.screen_width
     df['rel_target_y'] = df.gaze_y/df.screen_height
     df['rel_face_x'] = df.face_x1/df.img_width
@@ -31,7 +33,7 @@ def generate_features(raw_path, landmark_path, output_path):
     df['rel_right_pupil_x'] = (df.right_pupil_x - df.right_eye_x1)/(df.right_eye_x2 - df.right_eye_x1)
     df['rel_right_pupil_y'] = (df.right_pupil_y - df.right_eye_y1)/(df.right_eye_y2 - df.right_eye_y1)
 
-    df.to_csv("{}/features.csv".format(output_path), columns=['rel_target_x', 'rel_target_y', 'timestamp',
+    df.to_csv("{}/features.csv".format(output_path), columns=['raw_path', 'landmark_path', 'rel_target_x', 'rel_target_y', 'timestamp',
                                     'rel_face_x', 'rel_face_y', 'rel_face_size_x', 'rel_face_size_y',
                                     'rel_pose_x', 'rel_pose_y', 'rel_eye_distance_x', 'rel_eye_distance_y',
                                     'rel_left_pupil_x', 'rel_left_pupil_y', 'rel_right_pupil_x', 'rel_right_pupil_y'

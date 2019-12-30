@@ -39,6 +39,5 @@ def get_faces(img):
             face[eye_name]['bbox'] = [[eyebb_x1, eyebb_y1], [eyebb_x2, eyebb_y2]]
             if pupil:
                 face[eye_name]['pupil'] = [eyebb_x1 + round(pupil.pt[0]), eyebb_y1 + round(pupil.pt[1])]
-
         faces.append(face)
     return faces

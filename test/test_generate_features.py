@@ -4,7 +4,7 @@ from pipeline.step2_features import generate_features_for_datasets
 import os
 import time
 
-class TestProcess_landmarks(TestCase):
+class TestProcess_features(TestCase):
     test_output_path = "tmp/features/1"
     expected_output_path = "expected/features/1"
 
