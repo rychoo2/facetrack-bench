@@ -1,8 +1,5 @@
 from pipeline.models.model_base import ModelBase
-import numpy as np
 from keras.models import Sequential
-import pandas as pd
-import numpy as np
 
 from keras.layers import Dense
 class NNSequentialKerasBasic(ModelBase):

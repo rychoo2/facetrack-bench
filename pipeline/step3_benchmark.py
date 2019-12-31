@@ -1,18 +1,15 @@
-from keras.models import Sequential
 import pandas as pd
-import numpy as np
 import pprint
 import os
 
 from libs.utils import get_latest_features, get_timestamp
+from pipeline.models import CenterOfScreenModel, NNSequentialKerasBasic, NNSequentialKerasBasic0, LinearRegressionBasic
 
 pp = pprint.PrettyPrinter(indent=4)
 
-from pipeline.models import CenterOfScreenModel,  NNSequentialKerasBasic,  NNSequentialKerasBasic0
-
 train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data"
 
-models = [CenterOfScreenModel(), NNSequentialKerasBasic(), NNSequentialKerasBasic0()]
+models = [CenterOfScreenModel(), NNSequentialKerasBasic(), NNSequentialKerasBasic0(), LinearRegressionBasic()]
 
 
 def benchmark_models(input_path, output_path):
@@ -38,7 +35,7 @@ def benchmark_models(input_path, output_path):
             model.train(input, target)
             output = model.predict(input)
             benchmark = model.evaluate(output, target)
-            result.append([ dataset, model.name, benchmark])
+            result.append([dataset, model.name, benchmark])
 
     for model in models:
         model.train(overall_input, overall_target)
@@ -53,7 +50,8 @@ def benchmark_models(input_path, output_path):
     pp.pprint(result)
     return result
 
+
 if __name__ == '__main__':
     now = get_timestamp()
-    output_path = "{}/benchmark/{}".format(train_data_dir, now)
-    benchmark_models(train_data_dir, output_path)
+    output_dir = "{}/benchmark/{}".format(train_data_dir, now)
+    benchmark_models(train_data_dir, output_dir)
