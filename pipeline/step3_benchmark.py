@@ -1,57 +1,80 @@
 import pandas as pd
-import pprint
+import numpy as np
 import os
 
-from libs.utils import get_latest_features, get_timestamp
-from pipeline.models import CenterOfScreenModel, NNSequentialKerasBasic, NNSequentialKerasBasic0, LinearRegressionBasic
+from sklearn.model_selection import train_test_split
 
-pp = pprint.PrettyPrinter(indent=4)
+from libs.utils import get_latest_features, get_timestamp
+from pipeline.models import CenterOfScreenModel, NNSequentialKerasBasic, NNSequentialKerasBasic0, LinearRegressionBasic, \
+    LinearRidgeBasic, LinearLassoBasic, LinearElasticNetBasic, SklearnCustom, PLSRegression, BaggingRegressor, \
+    ExtraTreesRegressor, RandomForestRegressorBasic
+
+pd.options.display.float_format = "{:.4f}".format
 
 train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data"
 
-models = [CenterOfScreenModel(), NNSequentialKerasBasic(), NNSequentialKerasBasic0(), LinearRegressionBasic()]
+models = [
+    CenterOfScreenModel(),
+    #NNSequentialKerasBasic(), NNSequentialKerasBasic0(),
+    LinearRegressionBasic(),
+    LinearRidgeBasic(), LinearLassoBasic(), LinearElasticNetBasic(),
+    PLSRegression(),
+    BaggingRegressor(),
+    ExtraTreesRegressor(),
+    RandomForestRegressorBasic(),
+    SklearnCustom()
+]
+
+training_columns = ['rel_face_x', 'rel_face_y', 'rel_face_size_x', 'rel_face_size_y', 'rel_pose_x', 'rel_pose_y',
+                      'rel_eye_distance_x', 'rel_eye_distance_y', 'rel_left_pupil_x', 'rel_left_pupil_y',
+                      'rel_right_pupil_x', 'rel_right_pupil_y']
+
+target_columns = ['rel_target_x', 'rel_target_y']
 
 
-def benchmark_models(input_path, output_path):
+def benchmark_models_for_datasets(input_path, output_path):
     result = []
     os.makedirs(output_path)
-    overall_input = pd.DataFrame()
-    overall_target = pd.DataFrame()
+    overall = pd.DataFrame()
 
     for dataset, path in get_latest_features(input_path):
         data = pd.read_csv("{}/features.csv".format(path))
-        data.dropna(subset=['rel_target_x', 'rel_target_y'], inplace=True)
-        data.fillna(0.5, inplace=True)
+        overall = overall.append(data)
 
-        input = data[['rel_face_x', 'rel_face_y', 'rel_face_size_x', 'rel_face_size_y', 'rel_pose_x', 'rel_pose_y',
-                      'rel_eye_distance_x', 'rel_eye_distance_y', 'rel_left_pupil_x', 'rel_left_pupil_y',
-                      'rel_right_pupil_x', 'rel_right_pupil_y']]
-        target = data[['rel_target_x', 'rel_target_y']]
+        result += benchmark_models(dataset, data)
 
-        overall_input = overall_input.append(input)
-        overall_target = overall_target.append(target)
+    result += benchmark_models('overall', overall)
 
-        for model in models:
-            model.train(input, target)
-            output = model.predict(input)
-            benchmark = model.evaluate(output, target)
-            result.append([dataset, model.name, benchmark])
+    output_df = pd.DataFrame(result)
+    print(output_df)
+    output_df.to_csv(
+        "{}/benchmark.csv".format(output_path),
+            header=['dataset', 'model', 'train_score', 'test_score'],
+            index=False)
 
-    for model in models:
-        model.train(overall_input, overall_target)
-        output = model.predict(overall_input)
-        benchmark = model.evaluate(output, overall_target)
-        result.append(['overall', model.name, benchmark])
-
-    pd.DataFrame(result).to_csv("{}/benchmark.csv".format(output_path),
-                                header=['dataset', 'model', 'score'],
-                                index=False)
-
-    pp.pprint(result)
     return result
 
+
+def benchmark_models(dataset_name, df):
+    result = []
+    train_x, train_y, test_x, test_y = prepare_dataframe(df)
+    for model in models:
+        model.train(train_x, train_y)
+        train_output = model.predict(train_x)
+        test_output = model.predict(test_x)
+        train_benchmark = model.evaluate(train_output, train_y)
+        test_benchmark = model.evaluate(test_output, test_y)
+        result.append([dataset_name, model.name, train_benchmark, test_benchmark])
+    return result
+
+def prepare_dataframe(df):
+    df.dropna(subset=target_columns, inplace=True)
+    df.fillna(0.5, inplace=True)
+    train, test = train_test_split(df, test_size=0.2)
+    return (train[training_columns], train[target_columns],
+            test[training_columns], test[target_columns])
 
 if __name__ == '__main__':
     now = get_timestamp()
     output_dir = "{}/benchmark/{}".format(train_data_dir, now)
-    benchmark_models(train_data_dir, output_dir)
+    benchmark_models_for_datasets(train_data_dir, output_dir)

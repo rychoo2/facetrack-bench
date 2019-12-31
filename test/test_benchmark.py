@@ -1,6 +1,6 @@
 import shutil
 from unittest import TestCase
-from pipeline.step3_benchmark import benchmark_models
+from pipeline.step3_benchmark import benchmark_models_for_datasets
 import time
 
 class TestBenchmark_models(TestCase):
@@ -12,7 +12,7 @@ class TestBenchmark_models(TestCase):
 
     def test_generate_benchmarks(self):
         start = time.process_time()
-        benchmark_models("data", self.test_output_path)
+        benchmark_models_for_datasets("data", self.test_output_path)
         duration = time.process_time() - start
 
         self.assertTrue(

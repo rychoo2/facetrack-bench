@@ -3,4 +3,11 @@ from .center_of_screen_model import CenterOfScreenModel
 from .nn_sequential_keras_basic import NNSequentialKerasBasic
 from .nn_sequential_keras_basic0 import NNSequentialKerasBasic0
 from .linear_regression_basic import LinearRegressionBasic
-
+from .linear_ridge_basic import LinearRidgeBasic
+from .linear_lasso_basic import LinearLassoBasic
+from .linear_elasticnet_basic import LinearElasticNetBasic
+from .sklnearn_custom import SklearnCustom
+from .pls_regression import PLSRegression
+from .bagging_regressor import BaggingRegressor
+from .extra_trees_regressor import ExtraTreesRegressor
+from .random_forest_regressor_basic import RandomForestRegressorBasic
