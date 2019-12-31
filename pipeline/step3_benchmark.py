@@ -7,7 +7,8 @@ from sklearn.model_selection import train_test_split
 from libs.utils import get_latest_features, get_timestamp
 from pipeline.models import CenterOfScreenModel, NNSequentialKerasBasic, NNSequentialKerasBasic0, LinearRegressionBasic, \
     LinearRidgeBasic, LinearLassoBasic, LinearElasticNetBasic, SklearnCustom, PLSRegression, BaggingRegressor, \
-    ExtraTreesRegressor, RandomForestRegressorBasic
+    ExtraTreesRegressor, RandomForestRegressorBasic, MultiTaskLassoCV, MLPRegressor, DecisionTreeRegressor, \
+    ExtraTreeRegressor
 
 pd.options.display.float_format = "{:.4f}".format
 
@@ -22,7 +23,11 @@ models = [
     BaggingRegressor(),
     ExtraTreesRegressor(),
     RandomForestRegressorBasic(),
-    SklearnCustom()
+    MultiTaskLassoCV(),
+    MLPRegressor(),
+    DecisionTreeRegressor(),
+    ExtraTreeRegressor(),
+    SklearnCustom(),
 ]
 
 training_columns = ['rel_face_x', 'rel_face_y', 'rel_face_size_x', 'rel_face_size_y', 'rel_pose_x', 'rel_pose_y',
@@ -46,7 +51,8 @@ def benchmark_models_for_datasets(input_path, output_path):
     result += benchmark_models('overall', overall)
 
     output_df = pd.DataFrame(result)
-    print(output_df)
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+        print(output_df)
     output_df.to_csv(
         "{}/benchmark.csv".format(output_path),
             header=['dataset', 'model', 'train_score', 'test_score'],

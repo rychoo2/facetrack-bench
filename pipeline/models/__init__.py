@@ -11,3 +11,7 @@ from .pls_regression import PLSRegression
 from .bagging_regressor import BaggingRegressor
 from .extra_trees_regressor import ExtraTreesRegressor
 from .random_forest_regressor_basic import RandomForestRegressorBasic
+from .mulittask_lasso_cv import MultiTaskLassoCV
+from .mlp_regresor import MLPRegressor
+from .decision_tree_regressor import DecisionTreeRegressor
+from .extra_tree_regressor import ExtraTreeRegressor

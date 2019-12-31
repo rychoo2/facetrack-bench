@@ -1,11 +1,13 @@
 from pipeline.models.model_base import ModelBase
 
-import sklearn.linear_model
+import sklearn.tree
+import sklearn.multioutput
+
 
 class SklearnCustom(ModelBase):
 
     def __init__(self):
-        model = sklearn.linear_model.ARDRegression()
+        model = sklearn.tree.ExtraTreeRegressor()
         self.model = model
 
     def train(self, input, target):
@@ -13,4 +15,3 @@ class SklearnCustom(ModelBase):
 
     def predict(self, input):
         return self.model.predict(input)
-

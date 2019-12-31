@@ -1,10 +1,12 @@
 from pipeline.models.model_base import ModelBase
-from sklearn.linear_model import MultiTaskElasticNetCV
 
-class LinearElasticNetBasic(ModelBase):
+import sklearn.linear_model
+
+
+class MultiTaskLassoCV(ModelBase):
 
     def __init__(self):
-        model = MultiTaskElasticNetCV()
+        model = sklearn.linear_model.MultiTaskLassoCV()
         self.model = model
 
     def train(self, input, target):
@@ -12,4 +14,3 @@ class LinearElasticNetBasic(ModelBase):
 
     def predict(self, input):
         return self.model.predict(input)
-
