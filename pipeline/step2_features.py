@@ -40,10 +40,11 @@ def generate_features(raw_path, landmark_path, output_path):
                                     ])
 
 def generate_features_for_datasets(input_root, output_root):
-    for (dirname, landmark_path) in get_latest_landmarks(input_root):
-        generate_features("{}/raw/{}/positions.csv".format(input_root, dirname),
-                          "{}/landmarks.csv".format(landmark_path),
-                          "{}/{}".format(output_root, dirname))
+    landmark_path, datasets = get_latest_landmarks(input_root)
+    for dataset in datasets:
+        generate_features("{}/raw/{}/positions.csv".format(input_root, dataset),
+                          "{}/{}/landmarks.csv".format(landmark_path, dataset),
+                          "{}/{}".format(output_root, dataset))
 
 if __name__ == '__main__':
     now = get_timestamp()

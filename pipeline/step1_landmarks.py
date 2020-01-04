@@ -54,8 +54,9 @@ def process_landmarks(input_path, output_path):
 
 
 def generate_landmarks_for_datasets(input_root, output_root):
-    for dirname, path in get_datasets(input_root):
-        process_landmarks(path, "{}/{}".format(output_root, dirname))
+    path, datasets = get_datasets(input_root)
+    for dataset in datasets:
+        process_landmarks("{}/{}".format(path, dataset), "{}/{}".format(output_root, dataset))
 
 
 if __name__ == '__main__':

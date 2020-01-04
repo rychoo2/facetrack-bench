@@ -42,26 +42,28 @@ def benchmark_models_for_datasets(input_path, output_path):
     os.makedirs(output_path)
     overall = pd.DataFrame()
 
-    for dataset, path in get_latest_features(input_path):
-        data = pd.read_csv("{}/features.csv".format(path))
+    features_path, datasets = get_latest_features(input_path)
+    for dataset in datasets:
+        dataset_features_path = "{}/{}/features.csv".format(features_path, dataset)
+        data = pd.read_csv(dataset_features_path)
         overall = overall.append(data)
 
-        result += benchmark_models(dataset, data)
+        result += benchmark_models(dataset, dataset_features_path, data)
 
-    result += benchmark_models('overall', overall)
+    result += benchmark_models('overall', features_path, overall)
 
     output_df = pd.DataFrame(result)
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-        print(output_df)
+        print(output_df.drop(0))
     output_df.to_csv(
         "{}/benchmark.csv".format(output_path),
-            header=['dataset', 'model', 'train_score', 'test_score'],
+            header=['filename', 'dataset', 'model', 'train_score', 'test_score'],
             index=False)
 
     return result
 
 
-def benchmark_models(dataset_name, df):
+def benchmark_models(dataset_name, filename, df):
     result = []
     train_x, train_y, test_x, test_y = prepare_dataframe(df)
     for model in models:
@@ -70,7 +72,7 @@ def benchmark_models(dataset_name, df):
         test_output = model.predict(test_x)
         train_benchmark = model.evaluate(train_output, train_y)
         test_benchmark = model.evaluate(test_output, test_y)
-        result.append([dataset_name, model.name, train_benchmark, test_benchmark])
+        result.append([filename, dataset_name, model.name, train_benchmark, test_benchmark])
     return result
 
 def prepare_dataframe(df):
