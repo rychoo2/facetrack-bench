@@ -2,7 +2,6 @@ import itertools
 import os
 import glob
 import cv2
-from libs.face import get_faces
 from libs.utils import get_timestamp, get_latest_landmarks
 import pandas as pd
 

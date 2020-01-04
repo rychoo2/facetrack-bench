@@ -12,8 +12,7 @@ def process_landmarks(input_path, output_path):
     os.makedirs(output_path+'/images')
     with open('{}/landmarks.csv'.format(output_path), 'w') as fw:
         for f in glob.glob(input_path + "/images/*"):
-            img = cv2.imread(f)
-            faces = get_faces(img)
+            img, faces = generate_landmark_for_file(f)
             basefilename = f.replace(input_path + "/", "")
 
             if header:
@@ -38,20 +37,34 @@ def process_landmarks(input_path, output_path):
                 row += face['bbox'][0]
                 row += face['bbox'][1]
                 for (x, y) in face['landmarks']:
-                    cv2.circle(img, (x, y), 2, (0, 0, 255), -1)
                     row += [x, y]
                 for eye in ['left_eye', 'right_eye']:
                     row += face[eye]['bbox'][0]
                     row += face[eye]['bbox'][1]
                 for eye in ['left_eye', 'right_eye']:
                     pupil = face[eye].get('pupil')
-                    if pupil:
-                        cv2.circle(img, tuple(pupil), 1, (0, 255, 0), 2)
                     row += [pupil and pupil[0] or '', pupil and pupil[1] or '']
                 fw.write("{}\n".format(','.join([str(x) for x in row])))
                 fw.flush()
-            cv2.imwrite("{}/{}".format(output_path, basefilename), img)
 
+            generate_landmark_image(img, faces, "{}/{}".format(output_path, basefilename))
+
+
+def generate_landmark_for_file(filepath):
+    img = cv2.imread(filepath)
+    faces = get_faces(img)
+    return img, faces
+
+def generate_landmark_image(input_img, faces, output_path):
+    output_img = input_img.copy()
+    for face in faces:
+        for (x, y) in face['landmarks']:
+            cv2.circle(output_img, (x, y), 2, (0, 0, 255), -1)
+        for eye in ['left_eye', 'right_eye']:
+            pupil = face[eye].get('pupil')
+            if pupil:
+                cv2.circle(output_img, tuple(pupil), 1, (0, 255, 0), 2)
+    cv2.imwrite(output_path, output_img)
 
 def generate_landmarks_for_datasets(input_root, output_root):
     path, datasets = get_datasets(input_root)
