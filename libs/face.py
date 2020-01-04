@@ -5,12 +5,16 @@ from libs.eye_landmark import detect_pupil
 import os
 
 curdir = os.path.dirname(os.path.realpath(__file__))
-predictor_path = curdir + "/../../data/shape_predictor_68_face_landmarks.dat"
+landmarks_predictor_path = curdir + "/../../data/shape_predictor_68_face_landmarks.dat"
 eyes_cascade_path = curdir + '/../../data/haarcascades/haarcascade_eye_tree_eyeglasses.xml'
+face_cascade_path = curdir + '/../../data/haarcascades/haarcascade_frontalface_alt2.xml'
 face_detector = dlib.get_frontal_face_detector()
-landmarks_detector = dlib.shape_predictor(predictor_path)
+landmarks_detector = dlib.shape_predictor(landmarks_predictor_path)
+face_cascade = cv2.CascadeClassifier()
+face_cascade.load(cv2.samples.findFile(face_cascade_path))
 
-def get_faces(img):
+
+def get_landmarks(img):
     faces = []
     frame_processed = img.copy()
     frame_processed = cv2.medianBlur(frame_processed, 5)
@@ -18,26 +22,55 @@ def get_faces(img):
     frame_processed = cv2.equalizeHist(frame_processed)
 
     frame_final = frame_processed
+    faces_cv2 = face_cascade.detectMultiScale(frame_final)
+    primary_face_csv2 = get_largest_shape([dict(x=x, y=y, width=w, height=h) for (x, y, w, h) in faces_cv2])
+    faces_dlib = face_detector(frame_final, 1)
+    primary_face_dlib = get_largest_shape(
+        [dict(x=rect.left(), y=rect.top(), width=rect.width(), height=rect.height()) for rect in faces_dlib])
 
-    dets = face_detector(frame_final, 1)
-    for k, d in enumerate(dets):
-        _shape = landmarks_detector(frame_final, d)
-        shape = face_utils.shape_to_np(_shape)
+    face = dict(bbox=[[primary_face_dlib['x'], primary_face_dlib['y']],
+                      [primary_face_dlib['x'] + primary_face_dlib['width'],
+                       primary_face_dlib['y'] + primary_face_dlib['height']]] if primary_face_dlib else [[None, None], [None, None]],
+                bbox2=[[primary_face_csv2['x'], primary_face_csv2['y']],
+                       [primary_face_csv2['x'] + primary_face_csv2['width'],
+                        primary_face_csv2['y'] + primary_face_csv2['height']]] if primary_face_csv2 else [[None, None], [None, None]],
+                landmarks=None,
+                left_eye=dict(),
+                right_eye=dict())
 
-        face = dict(bbox = [[ d.left(), d.top()],[d.right(), d.bottom()]], landmarks = shape.tolist(), left_eye=dict(), right_eye=dict())
+    if None in face['bbox'][0]:
+        return face
 
-        for (eye_name, eye_bb) in [('right_eye', cv2.boundingRect(shape[36: 41])), ('left_eye', cv2.boundingRect(shape[42: 47]))]:
-            eyebb_y1, eyebb_y2, eyebb_x1, eyebb_x2 = eye_bb[1] - int(0.8*eye_bb[3]),\
-                eye_bb[1] + int(1.8 * eye_bb[3]), \
-                eye_bb[0] - int(0.8 * eye_bb[2]), \
-                eye_bb[0] + int(1.8 * eye_bb[2])
+    _shape = landmarks_detector(frame_final, dlib.rectangle(face['bbox'][0][0], face['bbox'][0][1],
+                                                            face['bbox'][1][0],
+                                                            face['bbox'][1][1]))
+    shape = face_utils.shape_to_np(_shape)
 
-            eye1_frame = frame_final[eyebb_y1: eyebb_y2, eyebb_x1:eyebb_x2]
-            eye1_frame = cv2.cvtColor(eye1_frame, cv2.COLOR_GRAY2RGB)
-            pupil = detect_pupil(eye1_frame)
+    face['landmarks'] = shape.tolist()
 
-            face[eye_name]['bbox'] = [[eyebb_x1, eyebb_y1], [eyebb_x2, eyebb_y2]]
-            if pupil:
-                face[eye_name]['pupil'] = [eyebb_x1 + round(pupil.pt[0]), eyebb_y1 + round(pupil.pt[1])]
-        faces.append(face)
+    for (eye_name, eye_bb) in [('right_eye', cv2.boundingRect(shape[36: 41])),
+                               ('left_eye', cv2.boundingRect(shape[42: 47]))]:
+        eyebb_y1, eyebb_y2, eyebb_x1, eyebb_x2 = eye_bb[1] - int(0.8 * eye_bb[3]), \
+                                                 eye_bb[1] + int(1.8 * eye_bb[3]), \
+                                                 eye_bb[0] - int(0.8 * eye_bb[2]), \
+                                                 eye_bb[0] + int(1.8 * eye_bb[2])
+
+        eye1_frame = frame_final[eyebb_y1: eyebb_y2, eyebb_x1:eyebb_x2]
+        eye1_frame = cv2.cvtColor(eye1_frame, cv2.COLOR_GRAY2RGB)
+        pupil = detect_pupil(eye1_frame)
+
+        face[eye_name]['bbox'] = [[eyebb_x1, eyebb_y1], [eyebb_x2, eyebb_y2]]
+        if pupil:
+            face[eye_name]['pupil'] = [eyebb_x1 + round(pupil.pt[0]), eyebb_y1 + round(pupil.pt[1])]
+    faces.append(face)
     return faces
+
+
+def get_largest_shape(shapes):
+    max_width = 0
+    max_shape = None
+    for shape in shapes:
+        if shape['width'] > max_width:
+            max_width = shape['width']
+            max_shape = shape
+    return max_shape

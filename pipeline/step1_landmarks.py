@@ -2,7 +2,7 @@ import itertools
 import os
 import glob
 import cv2
-from libs.face import get_faces
+from libs.face import get_landmarks
 from libs.utils import get_timestamp, get_datasets
 
 train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data"
@@ -52,7 +52,7 @@ def process_landmarks(input_path, output_path):
 
 def generate_landmark_for_file(filepath):
     img = cv2.imread(filepath)
-    faces = get_faces(img)
+    faces = get_landmarks(img)
     return img, faces
 
 def generate_landmark_image(input_img, faces, output_path):
