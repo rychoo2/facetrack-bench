@@ -18,7 +18,9 @@ models = [
     CenterOfScreenModel(),
     #NNSequentialKerasBasic(), NNSequentialKerasBasic0(),
     LinearRegressionBasic(),
-    LinearRidgeBasic(), LinearLassoBasic(), LinearElasticNetBasic(),
+    LinearRidgeBasic(),
+    LinearLassoBasic(),
+    LinearElasticNetBasic(),
     PLSRegression(),
     BaggingRegressor(),
     ExtraTreesRegressor(),
@@ -54,7 +56,7 @@ def benchmark_models_for_datasets(input_path, output_path):
 
     output_df = pd.DataFrame(result)
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-        print(output_df.drop(0))
+        print(output_df.drop(output_df.columns[0], axis=1))
     output_df.to_csv(
         "{}/benchmark.csv".format(output_path),
             header=['filename', 'dataset', 'model', 'train_score', 'test_score'],

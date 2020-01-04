@@ -1,11 +1,11 @@
 from pipeline.models.model_base import ModelBase
-from sklearn.linear_model import Lasso, LassoCV, MultiTaskLassoCV
+from sklearn.linear_model import Lasso #, LassoCV, MultiTaskLassoCV
 
 
 class LinearLassoBasic(ModelBase):
 
     def __init__(self):
-        model = MultiTaskLassoCV()
+        model = Lasso()
         self.model = model
 
     def train(self, input, target):

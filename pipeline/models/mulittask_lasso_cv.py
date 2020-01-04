@@ -6,7 +6,7 @@ import sklearn.linear_model
 class MultiTaskLassoCV(ModelBase):
 
     def __init__(self):
-        model = sklearn.linear_model.MultiTaskLassoCV()
+        model = sklearn.linear_model.MultiTaskLassoCV(max_iter=10000)
         self.model = model
 
     def train(self, input, target):
