@@ -58,7 +58,7 @@ def benchmark_models_for_datasets(input_path, output_path):
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
         print(output_df.drop(output_df.columns[0], axis=1))
     output_df.to_csv(
-        "{}/benchmark.csv".format(output_path),
+        "{}/models_benchmark.csv".format(output_path),
             header=['filename', 'dataset', 'model', 'train_score', 'test_score'],
             index=False)
 
@@ -86,5 +86,5 @@ def prepare_dataframe(df):
 
 if __name__ == '__main__':
     now = get_timestamp()
-    output_dir = "{}/benchmark/{}".format(train_data_dir, now)
+    output_dir = "{}/models_benchmark/{}".format(train_data_dir, now)
     benchmark_models_for_datasets(train_data_dir, output_dir)

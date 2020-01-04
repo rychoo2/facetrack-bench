@@ -1,6 +1,6 @@
 import shutil
 from unittest import TestCase
-from pipeline.step2_features import generate_features_for_datasets
+from pipeline.step3_features import generate_features_for_datasets
 import os
 import time
 
