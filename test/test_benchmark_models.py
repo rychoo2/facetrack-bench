@@ -10,7 +10,7 @@ class TestBenchmark_models(TestCase):
     def setUp(self) -> None:
         shutil.rmtree(self.test_output_path, ignore_errors=True, onerror=None)
 
-    def test_generate_benchmarks(self):
+    def test_benchmark_models_for_datasets(self):
         start = time.process_time()
         benchmark_models_for_datasets("data", self.test_output_path)
         duration = time.process_time() - start

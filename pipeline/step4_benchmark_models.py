@@ -74,7 +74,7 @@ def benchmark_models(dataset_name, filename, df):
         test_output = model.predict(test_x)
         train_benchmark = model.evaluate(train_output, train_y)
         test_benchmark = model.evaluate(test_output, test_y)
-        result.append([filename, dataset_name, model.name, train_benchmark, test_benchmark])
+        result.append([os.path.relpath(filename), dataset_name, model.name, train_benchmark, test_benchmark])
     return result
 
 def prepare_dataframe(df):

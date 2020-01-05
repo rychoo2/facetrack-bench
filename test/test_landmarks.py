@@ -11,7 +11,7 @@ class TestProcess_landmarks(TestCase):
     def setUp(self) -> None:
         shutil.rmtree(self.test_output_path, ignore_errors=True, onerror=None)
 
-    def test_process_landmarks(self):
+    def test_generate_landmarks_for_datasets(self):
         start = time.process_time()
         generate_landmarks_for_datasets("data", self.test_output_path)
         duration = time.process_time() - start
