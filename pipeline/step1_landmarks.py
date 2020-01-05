@@ -2,7 +2,7 @@ import itertools
 import os
 import glob
 import cv2
-from libs.face import get_face
+from libs.face import get_face, generate_landmark_image
 from libs.utils import get_timestamp, get_datasets
 
 train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data"
@@ -59,14 +59,8 @@ def generate_landmark_for_file(filepath):
     face = get_face(img)
     return img, face
 
-def generate_landmark_image(input_img, face, output_path):
-    output_img = input_img.copy()
-    for (x, y) in face['landmarks']:
-        cv2.circle(output_img, (x, y), 2, (0, 0, 255), -1)
-    for eye in ['left_eye', 'right_eye']:
-        pupil = face[eye].get('pupil')
-        if pupil:
-            cv2.circle(output_img, tuple(pupil), 1, (0, 255, 0), 2)
+def save_landmark_image(input_img, face, output_path):
+    output_img = generate_landmark_image(input_img, face)
     cv2.imwrite(output_path, output_img)
 
 def generate_landmarks_for_datasets(input_root, output_root):

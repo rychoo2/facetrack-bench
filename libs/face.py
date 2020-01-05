@@ -63,6 +63,15 @@ def get_face(img):
             face[eye_name]['pupil'] = [eyebb_x1 + round(pupil.pt[0]), eyebb_y1 + round(pupil.pt[1])]
     return face
 
+def generate_landmark_image(input_img, face):
+    output_img = input_img.copy()
+    for (x, y) in face['landmarks']:
+        cv2.circle(output_img, (x, y), 2, (0, 0, 255), -1)
+    for eye in ['left_eye', 'right_eye']:
+        pupil = face[eye].get('pupil')
+        if pupil:
+            cv2.circle(output_img, tuple(pupil), 1, (0, 255, 0), 2)
+    return output_img
 
 def get_largest_shape(shapes):
     max_width = 0
