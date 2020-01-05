@@ -32,7 +32,7 @@ class TestProcess_landmarks(TestCase):
 
         # should be 'quick'
         print("took {} cpu time".format(duration))
-        self.assertLess(duration, 130)
+        self.assertLess(duration, 170)
 
 
     def test_process_landmarks_for_file(self):

@@ -34,12 +34,12 @@ def get_landmarks(img):
                 bbox2=[[primary_face_csv2['x'], primary_face_csv2['y']],
                        [primary_face_csv2['x'] + primary_face_csv2['width'],
                         primary_face_csv2['y'] + primary_face_csv2['height']]] if primary_face_csv2 else [[None, None], [None, None]],
-                landmarks=None,
-                left_eye=dict(),
-                right_eye=dict())
+                landmarks=[],
+                left_eye=dict(bbox=[[None, None], [None, None]]),
+                right_eye=dict(bbox=[[None, None], [None, None]]))
 
     if None in face['bbox'][0]:
-        return face
+        return [face]
 
     _shape = landmarks_detector(frame_final, dlib.rectangle(face['bbox'][0][0], face['bbox'][0][1],
                                                             face['bbox'][1][0],

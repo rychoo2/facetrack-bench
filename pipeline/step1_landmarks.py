@@ -36,19 +36,24 @@ def process_landmarks(input_path, output_path):
                 row = row_common.copy()
                 row += face['bbox'][0]
                 row += face['bbox'][1]
-                for (x, y) in face['landmarks']:
-                    row += [x, y]
+                for i in range(0,68):
+                    landmark_x, landmark_y = face['landmarks'][i] if i < len(face['landmarks']) else [None, None]
+                    row += [landmark_x, landmark_y]
                 for eye in ['left_eye', 'right_eye']:
                     row += face[eye]['bbox'][0]
                     row += face[eye]['bbox'][1]
                 for eye in ['left_eye', 'right_eye']:
                     pupil = face[eye].get('pupil')
                     row += [pupil and pupil[0] or '', pupil and pupil[1] or '']
-                fw.write("{}\n".format(','.join([str(x) for x in row])))
+                fw.write("{}\n".format(','.join([xstr(x) for x in row])))
                 fw.flush()
 
             generate_landmark_image(img, faces, "{}/{}".format(output_path, basefilename))
 
+def xstr(s):
+    if s is None:
+        return ''
+    return str(s)
 
 def generate_landmark_for_file(filepath):
     img = cv2.imread(filepath)
