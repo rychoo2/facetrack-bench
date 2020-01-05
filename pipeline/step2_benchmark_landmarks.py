@@ -43,6 +43,7 @@ def benchmark_landmarks(dataset_name, filename, df):
     all_count = len(df.index)
     metrics = {
         'face_detection': df['face_x1'].count(),
+        'face_alt_detection': df['face_alt_x1'].count(),
         'landmark_detection': df['landmark46_y'].count(),
         'eyes_detection': df[(df['left_eye_x1'].notnull()) & (df['right_eye_x1'].notnull())].shape[0],
         'pupils_detection':  df[(df['left_pupil_x'].notnull()) & (df['right_pupil_x'].notnull())].shape[0],

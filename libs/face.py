@@ -14,8 +14,7 @@ face_cascade = cv2.CascadeClassifier()
 face_cascade.load(cv2.samples.findFile(face_cascade_path))
 
 
-def get_landmarks(img):
-    faces = []
+def get_face(img):
     frame_processed = img.copy()
     frame_processed = cv2.medianBlur(frame_processed, 5)
     frame_processed = cv2.cvtColor(frame_processed, cv2.COLOR_BGR2GRAY)
@@ -39,7 +38,7 @@ def get_landmarks(img):
                 right_eye=dict(bbox=[[None, None], [None, None]]))
 
     if None in face['bbox'][0]:
-        return [face]
+        return face
 
     _shape = landmarks_detector(frame_final, dlib.rectangle(face['bbox'][0][0], face['bbox'][0][1],
                                                             face['bbox'][1][0],
@@ -62,8 +61,7 @@ def get_landmarks(img):
         face[eye_name]['bbox'] = [[eyebb_x1, eyebb_y1], [eyebb_x2, eyebb_y2]]
         if pupil:
             face[eye_name]['pupil'] = [eyebb_x1 + round(pupil.pt[0]), eyebb_y1 + round(pupil.pt[1])]
-    faces.append(face)
-    return faces
+    return face
 
 
 def get_largest_shape(shapes):

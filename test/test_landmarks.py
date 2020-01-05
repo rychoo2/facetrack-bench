@@ -8,10 +8,9 @@ class TestProcess_landmarks(TestCase):
     test_output_path = "tmp/landmarks/1"
     expected_output_path = "expected/landmarks/1"
 
-    def setUp(self) -> None:
-        shutil.rmtree(self.test_output_path, ignore_errors=True, onerror=None)
 
     def test_generate_landmarks_for_datasets(self):
+        shutil.rmtree(self.test_output_path, ignore_errors=True, onerror=None)
         start = time.process_time()
         generate_landmarks_for_datasets("data", self.test_output_path)
         duration = time.process_time() - start
@@ -35,10 +34,10 @@ class TestProcess_landmarks(TestCase):
         self.assertLess(duration, 170)
 
 
-    def test_process_landmarks_for_file(self):
+    def test_process_for_file(self):
         img, landmarks = generate_landmark_for_file('images/20191215123728.jpg')
         generate_landmark_image(img, landmarks, 'tmp/20191215123728.jpg')
-
+        print(landmarks)
         self.assertIsNotNone(landmarks)
         self.assertTrue(len(landmarks) > 0)
 

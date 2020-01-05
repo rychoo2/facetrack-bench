@@ -5,7 +5,7 @@ import glob
 import cv2
 import numpy as np
 from imutils import face_utils
-from libs.face import get_landmarks
+from libs.face import get_face
 
 cam = cv2.VideoCapture(0)
 color_green = (0,255,0)
@@ -14,7 +14,7 @@ line_width = 3
 while True:
     ret_val, img = cam.read()
 
-    faces = get_landmarks(img)
+    faces = get_face(img)
 
     for face in faces:
         print(face)

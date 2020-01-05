@@ -80,7 +80,7 @@ def benchmark_models(dataset_name, filename, df):
 def prepare_dataframe(df):
     df.dropna(subset=target_columns, inplace=True)
     df.fillna(0.5, inplace=True)
-    train, test = train_test_split(df, test_size=0.2)
+    train, test = train_test_split(df, test_size=0.2, random_state=0)
     return (train[training_columns], train[target_columns],
             test[training_columns], test[target_columns])
 
