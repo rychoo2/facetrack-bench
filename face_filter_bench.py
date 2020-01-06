@@ -76,16 +76,16 @@ def imggrid(vrow):
                      vrow,
                       [erode(i) for i in vrow],
                       [dilate(i) for i in vrow],
-                      [cv2.morphologyEx(i, cv2.MORPH_OPEN, kernel) for i in vrow],
-                      [cv2.morphologyEx(i, cv2.MORPH_CLOSE, kernel) for i in vrow],
-                      [cv2.morphologyEx(i, cv2.MORPH_CROSS, kernel) for i in vrow],
-                      [cv2.cvtColor(cv2.Canny(i, 50, 250), cv2.COLOR_GRAY2RGB) for i in vrow],
+                      # [cv2.morphologyEx(i, cv2.MORPH_OPEN, kernel) for i in vrow],
+                      # [cv2.morphologyEx(i, cv2.MORPH_CLOSE, kernel) for i in vrow],
+                      # [cv2.morphologyEx(i, cv2.MORPH_CROSS, kernel) for i in vrow],
+                      # [cv2.cvtColor(cv2.Canny(i, 50, 250), cv2.COLOR_GRAY2RGB) for i in vrow],
                       ]
     imggrid_3d = []
     for vr in imggrid:
         imggrid_3d.append(vr)
-        imggrid_3d.append(detect_contours(i, cv2.CHAIN_APPROX_SIMPLE) for i in vr)
-        imggrid_3d.append(detect_contours(i, cv2.CHAIN_APPROX_SIMPLE, hull=True) for i in vr)
+        # imggrid_3d.append(detect_contours(i, cv2.CHAIN_APPROX_SIMPLE) for i in vr)
+        # imggrid_3d.append(detect_contours(i, cv2.CHAIN_APPROX_SIMPLE, hull=True) for i in vr)
         # imggrid_3d.append(detect_circle(i) for i in vr)
         # imggrid_3d.append(detect_blobs(i) for i in vr)
 
@@ -102,35 +102,35 @@ for image_file in ['./images/face1.jpg', './images/face0.jpg']:
 
     # faceimg_final = cv2.morphologyEx(faceimg_final, cv2.MORPH_OPEN, kernel)
     cv2.imshow(image_file,
-               cv2.pyrDown(imggrid([
+               cv2.pyrDown(cv2.pyrDown(imggrid([
                    faceimg,
                    faceimg_final,
                    draw_face(faceimg),
                    # cv2.threshold(faceimg_final, 150, 255, cv2.THRESH_BINARY)[1],
                    # cv2.threshold(faceimg_final, 50, 255, cv2.THRESH_BINARY)[1],
-                   cv2.threshold(faceimg_final, 0, 255, cv2.THRESH_BINARY)[1],
-                   cv2.threshold(faceimg_final, 1, 255, cv2.THRESH_BINARY)[1],
-                   cv2.threshold(faceimg_final, 5, 255, cv2.THRESH_BINARY)[1],
-                   cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 5, 0), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 5, 1), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 5, 2), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 7, 2), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 9, 2), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 11, 2), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 11, 3), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 11, 4), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 13, 1), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 13, 2), cv2.COLOR_GRAY2RGB)
-                   ])))
+                   # cv2.threshold(faceimg_final, 0, 255, cv2.THRESH_BINARY)[1],
+                   # cv2.threshold(faceimg_final, 1, 255, cv2.THRESH_BINARY)[1],
+                   # cv2.threshold(faceimg_final, 5, 255, cv2.THRESH_BINARY)[1],
+                   # cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 5, 0), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 5, 1), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 5, 2), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 7, 2), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 9, 2), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 11, 2), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 11, 3), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 11, 4), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 13, 1), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(faceimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 13, 2), cv2.COLOR_GRAY2RGB)
+                   ]))))
 
 cv2.waitKey(0)

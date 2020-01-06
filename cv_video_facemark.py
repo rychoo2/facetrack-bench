@@ -12,8 +12,8 @@ color_green = (0,255,0)
 line_width = 3
 
 facemark = cv.face.createFacemarkLBF()
-facemark.loadModel(cv.samples.findFile('data/lbfmodel.yaml'))
-cascade = cv.CascadeClassifier(cv.samples.findFile('data/haarcascades/haarcascade_frontalface_alt2.xml'))
+facemark.loadModel(cv.samples.findFile('../data/lbfmodel.yaml'))
+cascade = cv.CascadeClassifier(cv.samples.findFile('../data/haarcascades/haarcascade_frontalface_alt2.xml'))
 
 while True:
     ret_val, img = cam.read()

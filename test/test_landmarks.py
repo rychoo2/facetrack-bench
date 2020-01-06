@@ -36,8 +36,9 @@ class TestProcess_landmarks(TestCase):
 
     def test_process_for_file(self):
         img, face = generate_landmark_for_file('images/20191215123728.jpg')
-        save_landmark_image(img, face, 'tmp/20191215123728.jpg')
         print(face)
+
+        save_landmark_image(img, face, 'tmp/20191215123728.jpg')
         self.assertIsNotNone(face)
         self.assertTrue(len(face['landmarks']) > 0)
 
