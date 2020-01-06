@@ -28,7 +28,6 @@ def get_face(img):
 
     frame_final = frame_processed
     faces_cv2 = face_cascade.detectMultiScale(frame_final)
-    print(faces_cv2)
     primary_face_csv2_index, primary_face_csv2 = get_largest_shape([dict(x=x, y=y, width=w, height=h) for (x, y, w, h) in faces_cv2])
     faces_dlib = face_detector(frame_final, 1)
     primary_face_dlib_index, primary_face_dlib = get_largest_shape(
