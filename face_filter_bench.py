@@ -92,7 +92,7 @@ def imggrid(vrow):
     return np.hstack((np.vstack(tuple(row)) for row in imggrid_3d))
 
 
-for image_file in ['./images/face1.jpg', './images/face0.jpg']:
+for image_file in ['./images/face1.jpg', './images/face0.jpg', './images/face1_gray.jpg']:
     faceimg = cv2.imread(image_file)
     # cv2.circle(faceimg, (50, 50), 5, (255, 0,0 ), 3)
     faceimg2 = cv2.GaussianBlur(faceimg, (5,5), 0)

@@ -41,6 +41,7 @@ def get_face(img):
                        [primary_face_csv2['x'] + primary_face_csv2['width'],
                         primary_face_csv2['y'] + primary_face_csv2['height']]] if primary_face_csv2 else [[None, None], [None, None]],
                 landmarks=[],
+                landmarks2=[],
                 left_eye=dict(bbox=[[None, None], [None, None]]),
                 right_eye=dict(bbox=[[None, None], [None, None]]))
 
@@ -69,7 +70,6 @@ def get_face(img):
                 face[eye_name]['pupil'] = [eyebb_x1 + round(pupil.pt[0]), eyebb_y1 + round(pupil.pt[1])]
 
     if None not in face['bbox2'][0]:
-        print(primary_face_csv2)
         ok, landmarks2 = facemark.fit(frame_final, faces=faces_cv2)
         face['landmarks2'] = landmarks2[0][0].tolist()
 

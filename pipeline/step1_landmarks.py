@@ -47,7 +47,7 @@ def process_landmarks(input_path, output_path):
             fw.write("{}\n".format(','.join([xstr(x) for x in row])))
             fw.flush()
 
-            generate_landmark_image(img, face, "{}/{}".format(output_path, basefilename))
+            save_landmark_image(img, face, "{}/{}".format(output_path, basefilename))
 
 def xstr(s):
     if s is None:
