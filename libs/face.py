@@ -33,25 +33,25 @@ def get_face(img):
     primary_face_dlib_index, primary_face_dlib = get_largest_shape(
         [dict(x=rect.left(), y=rect.top(), width=rect.width(), height=rect.height()) for rect in faces_dlib])
 
-    face = dict(bbox=[[primary_face_dlib['x'], primary_face_dlib['y']],
+    face = dict(bbox_dlib=[[primary_face_dlib['x'], primary_face_dlib['y']],
                       [primary_face_dlib['x'] + primary_face_dlib['width'],
                        primary_face_dlib['y'] + primary_face_dlib['height']]] if primary_face_dlib else [[None, None], [None, None]],
-                bbox2=[[primary_face_csv2['x'], primary_face_csv2['y']],
+                bbox_opencv=[[primary_face_csv2['x'], primary_face_csv2['y']],
                        [primary_face_csv2['x'] + primary_face_csv2['width'],
                         primary_face_csv2['y'] + primary_face_csv2['height']]] if primary_face_csv2 else [[None, None], [None, None]],
-                landmarks=[],
-                landmarks2=[],
+                landmarks_dlib=[],
+                landmarks_opencv=[],
                 left_eye=dict(bbox=[[None, None], [None, None]]),
                 right_eye=dict(bbox=[[None, None], [None, None]]))
 
-    if None not in face['bbox'][0]:
+    if None not in face['bbox_dlib'][0]:
 
-        _shape = landmarks_detector(frame_final, dlib.rectangle(face['bbox'][0][0], face['bbox'][0][1],
-                                                                face['bbox'][1][0],
-                                                                face['bbox'][1][1]))
+        _shape = landmarks_detector(frame_final, dlib.rectangle(face['bbox_dlib'][0][0], face['bbox_dlib'][0][1],
+                                                                face['bbox_dlib'][1][0],
+                                                                face['bbox_dlib'][1][1]))
 
         shape = face_utils.shape_to_np(_shape)
-        face['landmarks'] = shape.tolist()
+        face['landmarks_dlib'] = shape.tolist()
 
         for (eye_name, eye_bb) in [('right_eye', cv2.boundingRect(shape[36: 41])),
                                    ('left_eye', cv2.boundingRect(shape[42: 47]))]:
@@ -68,21 +68,21 @@ def get_face(img):
             if pupil:
                 face[eye_name]['pupil'] = [eyebb_x1 + round(pupil.pt[0]), eyebb_y1 + round(pupil.pt[1])]
 
-    if None not in face['bbox2'][0]:
+    if None not in face['bbox_opencv'][0]:
         ok, landmarks2 = facemark.fit(frame_final, faces=faces_cv2)
-        face['landmarks2'] = landmarks2[0][0].tolist()
+        face['landmarks_opencv'] = landmarks2[0][0].tolist()
 
     return face
 
 def generate_landmark_image(input_img, face):
     output_img = input_img.copy()
-    if None not in face['bbox'][0]:
-        cv2.rectangle(output_img, pt1= tuple(face['bbox'][0]), pt2=tuple(face['bbox'][1]), color=(0, 0, 255))
-    for (x, y) in face['landmarks']:
+    if None not in face['bbox_dlib'][0]:
+        cv2.rectangle(output_img, pt1= tuple(face['bbox_dlib'][0]), pt2=tuple(face['bbox_dlib'][1]), color=(0, 0, 255))
+    for (x, y) in face['landmarks_dlib']:
         cv2.circle(output_img, (round(x), round(y)), 2, (0, 0, 255), -1)
-    if None not in face['bbox2'][0]:
-        cv2.rectangle(output_img, pt1=tuple(face['bbox2'][0]), pt2=tuple(face['bbox2'][1]), color=(255, 0, 0))
-    for (x, y) in face['landmarks2']:
+    if None not in face['bbox_opencv'][0]:
+        cv2.rectangle(output_img, pt1=tuple(face['bbox_opencv'][0]), pt2=tuple(face['bbox_opencv'][1]), color=(255, 0, 0))
+    for (x, y) in face['landmarks_opencv']:
         cv2.circle(output_img, (round(x), round(y)), 2, (255, 0, 0), -1)
     for eye in ['left_eye', 'right_eye']:
         pupil = face[eye].get('pupil')

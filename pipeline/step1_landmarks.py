@@ -17,9 +17,10 @@ def process_landmarks(input_path, output_path):
 
             if header:
                 row = list(itertools.chain.from_iterable([['filename', 'img_width', 'img_height'],
-                                                          ['face_x1', 'face_y1', 'face_x2', 'face_y2'],
-                                                          ['face_alt_x1', 'face_alt_y1', 'face_alt_x2', 'face_alt_y2'],
-                                                          *[("landmark{}_x".format(i), "landmark{}_y".format(i)) for i in range(1, 69)],
+                                                          ['face_dlib_x1', 'face_dlib_y1', 'face_dlib_x2', 'face_dlib_y2'],
+                                                          ['face_opencv_x1', 'face_opencv_y1', 'face_opencv_x2', 'face_opencv_y2'],
+                                                          *[("landmark_dlib_{}_x".format(i), "landmark_dlib_{}_y".format(i)) for i in range(1, 69)],
+                                                          *[("landmark_opencv_{}_x".format(i), "landmark_opencv_{}_y".format(i)) for i in range(1, 69)],
                                                           ["left_eye_x1", "left_eye_y1", "left_eye_x2", "left_eye_y2"],
                                                           ["right_eye_x1", "right_eye_y1", "right_eye_x2", "right_eye_y2"],
                                                           ["left_pupil_x", "left_pupil_y", "right_pupil_x", "right_pupil_y"]]
@@ -31,12 +32,15 @@ def process_landmarks(input_path, output_path):
             row_common = [basefilename, str(img.shape[1]), str(img.shape[0])]
 
             row = row_common.copy()
-            row += face['bbox'][0]
-            row += face['bbox'][1]
-            row += face['bbox2'][0]
-            row += face['bbox2'][1]
+            row += face['bbox_dlib'][0]
+            row += face['bbox_dlib'][1]
+            row += face['bbox_opencv'][0]
+            row += face['bbox_opencv'][1]
             for i in range(0,68):
-                landmark_x, landmark_y = face['landmarks'][i] if i < len(face['landmarks']) else [None, None]
+                landmark_x, landmark_y = face['landmarks_dlib'][i] if i < len(face['landmarks_dlib']) else [None, None]
+                row += [landmark_x, landmark_y]
+            for i in range(0,68):
+                landmark_x, landmark_y = face['landmarks_opencv'][i] if i < len(face['landmarks_opencv']) else [None, None]
                 row += [landmark_x, landmark_y]
             for eye in ['left_eye', 'right_eye']:
                 row += face[eye]['bbox'][0]
