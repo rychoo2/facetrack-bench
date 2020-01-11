@@ -44,8 +44,10 @@ def benchmark_landmarks(dataset_name, filename, df):
     metrics = {
         'face_dlib_detection': df['face_dlib_x1'].count(),
         'face_opencv_detection': df['face_opencv_x1'].count(),
+        'face_any_detection': df[(df['face_dlib_x1'].notnull()) | (df['face_opencv_x1'].notnull())].shape[0],
         'landmark_dlib_detection': df['landmark_dlib_46_y'].count(),
         'landmark_opencv_detection': df['landmark_opencv_46_y'].count(),
+        'landmark_any_detection':df[(df['landmark_dlib_46_y'].notnull()) | (df['landmark_opencv_46_y'].notnull())].shape[0],
         'eyes_detection': df[(df['left_eye_x1'].notnull()) & (df['right_eye_x1'].notnull())].shape[0],
         'pupils_detection':  df[(df['left_pupil_x'].notnull()) & (df['right_pupil_x'].notnull())].shape[0],
         'right_eye_detection': df['right_eye_x1'].count(),
