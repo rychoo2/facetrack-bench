@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
+import collections
 
 from sklearn.model_selection import train_test_split
 
@@ -43,14 +44,22 @@ def benchmark_models_for_datasets(input_path, output_path):
     result = []
     os.makedirs(output_path)
     overall = pd.DataFrame()
+    overall_groups = collections.defaultdict(pd.DataFrame)
 
     features_path, datasets = get_latest_features(input_path)
+
+    dataset_groups = get_dataset_groups(datasets)
+
     for dataset in datasets:
         dataset_features_path = "{}/{}/features.csv".format(features_path, dataset)
         data = pd.read_csv(dataset_features_path)
         overall = overall.append(data)
+        overall_groups[dataset_groups[dataset]] = overall_groups[dataset_groups[dataset]].append(data)
 
         result += benchmark_models(dataset, dataset_features_path, data)
+
+    for grp, df in overall_groups.items():
+        result += benchmark_models('overall_{}'.format(grp), features_path, df)
 
     result += benchmark_models('overall', features_path, overall)
 
@@ -64,6 +73,14 @@ def benchmark_models_for_datasets(input_path, output_path):
 
     return result
 
+
+def get_dataset_groups(datasets):
+    d = dict()
+
+    for group, name in [(dataset[dataset.rindex('_')+1:], dataset) for dataset in datasets]:
+        d[name] = group
+
+    return d
 
 def benchmark_models(dataset_name, filename, df):
     result = []

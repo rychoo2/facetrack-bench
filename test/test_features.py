@@ -17,10 +17,10 @@ class TestProcess_features(TestCase):
         duration = time.process_time() - start
 
         # should have 2 datasets
-        self.assertTrue(set(os.listdir(self.test_output_path)).issuperset({'capture0', 'capture1'}))
+        self.assertTrue(set(os.listdir(self.test_output_path)).issuperset({'capture0_dlib', 'capture1_dlib', 'capture0_opencv', 'capture1_opencv'}))
 
         # should have expected landmark.csv's
-        for dataset in ['capture0', 'capture1']:
+        for dataset in ['capture0_dlib', 'capture1_dlib', 'capture0_opencv', 'capture1_opencv']:
             self.assertListEqual(
                 self.readfile("{}/{}/features.csv".format(self.test_output_path, dataset)),
                 self.readfile("{}/{}/features.csv".format(self.expected_output_path, dataset))

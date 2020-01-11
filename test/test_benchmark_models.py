@@ -2,6 +2,7 @@ import shutil
 from unittest import TestCase
 from pipeline.step4_benchmark_models import benchmark_models_for_datasets
 import time
+import pandas as pd
 
 class TestBenchmark_models(TestCase):
     test_output_path = "tmp/models_benchmark/1"
@@ -15,8 +16,13 @@ class TestBenchmark_models(TestCase):
         benchmark_models_for_datasets("data", self.test_output_path)
         duration = time.process_time() - start
 
+        output = pd.read_csv("{}/models_benchmark.csv".format(self.test_output_path))
         self.assertTrue(
-            len(self.readfile("{}/models_benchmark.csv".format(self.test_output_path))) >= 10,
+            len(output) > 70
+        )
+        self.assertEquals(
+            sorted(output.dataset.unique()),
+            ['capture0_dlib', 'capture0_opencv', 'capture1_dlib', 'capture1_opencv', 'overall', 'overall_dlib', 'overall_opencv']
         )
 
         # should be 'quick'
