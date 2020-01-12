@@ -16,10 +16,10 @@ class TestProcess_landmarks(TestCase):
         duration = time.process_time() - start
 
         # should have 2 datasets
-        self.assertTrue(set(os.listdir(self.test_output_path)).issuperset({'capture0', 'capture1'}))
+        self.assertTrue(set(os.listdir(self.test_output_path)).issuperset({'capture0', 'capture1', 'capture2'}))
 
         # should have expected landmark.csv's
-        for dataset in ['capture0', 'capture1']:
+        for dataset in ['capture0', 'capture1', 'capture2']:
             self.assertListEqual(
                 self.readfile("{}/{}/landmarks.csv".format(self.test_output_path, dataset)),
                 self.readfile("{}/{}/landmarks.csv".format(self.expected_output_path, dataset))
@@ -31,7 +31,7 @@ class TestProcess_landmarks(TestCase):
 
         # should be 'quick'
         print("took {} cpu time".format(duration))
-        self.assertLess(duration, 170)
+        self.assertLess(duration, 230)
 
 
     def test_process_for_file(self):
@@ -40,7 +40,7 @@ class TestProcess_landmarks(TestCase):
 
         save_landmark_image(img, face, 'tmp/face1.jpg')
         self.assertIsNotNone(face)
-        self.assertTrue(len(face['landmarks']) > 0)
+        self.assertTrue(len(face['landmarks_opencv']) > 0 or len(face['landmarks_dlib']) > 0)
 
     def test_process_for_file2(self):
         img, face = generate_landmark_for_file('images/face0.jpg')
@@ -48,7 +48,7 @@ class TestProcess_landmarks(TestCase):
 
         save_landmark_image(img, face, 'tmp/face0.jpg')
         self.assertIsNotNone(face)
-        self.assertTrue(len(face['landmarks']) > 0)
+        self.assertTrue(len(face['landmarks_opencv']) > 0 or len(face['landmarks_dlib']) > 0)
 
     def readfile(self, path):
         with open(path) as f:

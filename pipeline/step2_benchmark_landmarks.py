@@ -17,6 +17,7 @@ def benchmark_landmarks_for_datasets(input_path, output_path):
     overall = pd.DataFrame()
 
     landmarks_path, datasets = get_latest_landmarks(input_path)
+
     for dataset in datasets:
         dataset_landmark_path = "{}/{}/landmarks.csv".format(landmarks_path, dataset)
         data = pd.read_csv(dataset_landmark_path)
@@ -55,6 +56,7 @@ def benchmark_landmarks(dataset_name, filename, df):
         'right_pupil_detection':  df['right_pupil_x'].count(),
         'left_pupil_detection':  df['left_pupil_x'].count(),
     }
+    result.append([os.path.relpath(filename), dataset_name, 'count', all_count])
     for name, value in metrics.items():
         result.append([os.path.relpath(filename), dataset_name, name, 1.0*value/all_count])
     return result

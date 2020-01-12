@@ -53,8 +53,15 @@ def get_face(img):
         shape = face_utils.shape_to_np(_shape)
         face['landmarks_dlib'] = shape.tolist()
 
-        for (eye_name, eye_bb) in [('right_eye', cv2.boundingRect(shape[36: 41])),
-                                   ('left_eye', cv2.boundingRect(shape[42: 47]))]:
+    if None not in face['bbox_opencv'][0]:
+        ok, landmarks2 = facemark.fit(frame_final, faces=faces_cv2)
+        face['landmarks_opencv'] = [[int(x[0]), int(x[1])] for x in landmarks2[0][0]]
+
+    face_landmarks = face['landmarks_dlib'] or face['landmarks_opencv']
+
+    if len(face_landmarks) > 0:
+        for (eye_name, eye_bb) in [('right_eye', cv2.boundingRect(np.array(face_landmarks[36: 41]))),
+                                   ('left_eye', cv2.boundingRect(np.array(face_landmarks[42: 47])))]:
             eyebb_y1, eyebb_y2, eyebb_x1, eyebb_x2 = eye_bb[1] - int(0.8 * eye_bb[3]), \
                                                      eye_bb[1] + int(1.8 * eye_bb[3]), \
                                                      eye_bb[0] - int(0.8 * eye_bb[2]), \
@@ -67,10 +74,6 @@ def get_face(img):
             face[eye_name]['bbox'] = [[eyebb_x1, eyebb_y1], [eyebb_x2, eyebb_y2]]
             if pupil:
                 face[eye_name]['pupil'] = [eyebb_x1 + round(pupil.pt[0]), eyebb_y1 + round(pupil.pt[1])]
-
-    if None not in face['bbox_opencv'][0]:
-        ok, landmarks2 = facemark.fit(frame_final, faces=faces_cv2)
-        face['landmarks_opencv'] = landmarks2[0][0].tolist()
 
     return face
 

@@ -77,7 +77,7 @@ def benchmark_models_for_datasets(input_path, output_path):
 def get_dataset_groups(datasets):
     d = dict()
 
-    for group, name in [(dataset[dataset.rindex('_')+1:], dataset) for dataset in datasets]:
+    for group, name in [(dataset[dataset.rfind('_')+1:], dataset) for dataset in datasets]:
         d[name] = group
 
     return d

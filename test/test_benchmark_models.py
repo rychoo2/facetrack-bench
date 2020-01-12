@@ -21,8 +21,8 @@ class TestBenchmark_models(TestCase):
             len(output) > 70
         )
         self.assertEquals(
-            sorted(output.dataset.unique()),
-            ['capture0_dlib', 'capture0_opencv', 'capture1_dlib', 'capture1_opencv', 'overall', 'overall_dlib', 'overall_opencv']
+            set(output.dataset.unique()),
+            {'capture0_dlib', 'capture0_opencv', 'capture1_dlib', 'capture1_opencv', 'overall', 'overall_dlib', 'overall_opencv', 'capture2_dlib', 'capture2_opencv'}
         )
 
         # should be 'quick'
