@@ -68,7 +68,7 @@ def benchmark_models_for_datasets(input_path, output_path):
         print(output_df.drop(output_df.columns[0], axis=1))
     output_df.to_csv(
         "{}/models_benchmark.csv".format(output_path),
-            header=['filename', 'dataset', 'model', 'train_score', 'test_score'],
+            header=['filename', 'dataset', 'model', 'count', 'train_score', 'test_score'],
             index=False)
 
     return result
@@ -91,7 +91,7 @@ def benchmark_models(dataset_name, filename, df):
         test_output = model.predict(test_x)
         train_benchmark = model.evaluate(train_output, train_y)
         test_benchmark = model.evaluate(test_output, test_y)
-        result.append([os.path.relpath(filename), dataset_name, model.name, train_benchmark, test_benchmark])
+        result.append([os.path.relpath(filename), dataset_name, model.name, len(df.index), train_benchmark, test_benchmark])
     return result
 
 def prepare_dataframe(df):

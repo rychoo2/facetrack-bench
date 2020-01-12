@@ -22,7 +22,9 @@ class TestBenchmark_models(TestCase):
         )
         self.assertEquals(
             set(output.dataset.unique()),
-            {'capture0_dlib', 'capture0_opencv', 'capture1_dlib', 'capture1_opencv', 'overall', 'overall_dlib', 'overall_opencv', 'capture2_dlib', 'capture2_opencv'}
+            {'capture0_dlib', 'capture0_opencv', 'capture1_dlib', 'capture1_opencv', 'overall', 'overall_dlib',
+             'overall_opencv', 'capture2_dlib', 'capture2_opencv',
+             'capture2_landmark_avg', 'capture1_landmark_avg', 'overall_avg', 'capture0_landmark_avg' }
         )
 
         # should be 'quick'

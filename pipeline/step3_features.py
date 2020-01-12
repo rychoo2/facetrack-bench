@@ -62,6 +62,23 @@ def include_output_features_opencv(df):
     df['rel_right_pupil_x'] = (df.right_pupil_x - df.right_eye_x1) / (df.right_eye_x2 - df.right_eye_x1)
     df['rel_right_pupil_y'] = (df.right_pupil_y - df.right_eye_y1) / (df.right_eye_y2 - df.right_eye_y1)
 
+def include_output_features_avg(df):
+    df['rel_target_x'] = df.gaze_x / df.screen_width
+    df['rel_target_y'] = df.gaze_y / df.screen_height
+    df['rel_face_x'] = df[['face_opencv_x1', 'face_dlib_x1']].mean(axis=1) / df.img_width
+    df['rel_face_y'] = df[['face_opencv_y1', 'face_dlib_y1']].mean(axis=1)/ df.img_height
+    df['face_size_x'] = (df[['face_opencv_x2', 'face_dlib_x2']].mean(axis=1) - df[['face_opencv_x1', 'face_dlib_x1']].mean(axis=1))
+    df['face_size_y'] = (df[['face_opencv_y2', 'face_dlib_y2']].mean(axis=1) - df[['face_opencv_y1', 'face_dlib_y1']].mean(axis=1))
+    df['rel_face_size_x'] = df.face_size_x / df.img_width
+    df['rel_face_size_y'] = df.face_size_y / df.img_height
+    df['rel_pose_x'] = (df[['landmark_opencv_34_x', 'landmark_dlib_34_x']].mean(axis=1) - df[['face_opencv_x1', 'face_dlib_x1']].mean(axis=1)) / df['face_size_x']
+    df['rel_pose_y'] = (df[['landmark_opencv_34_y', 'landmark_dlib_34_y']].mean(axis=1) - df[['face_opencv_y1', 'face_dlib_y1']].mean(axis=1)) / df['face_size_y']
+    df['rel_eye_distance_x'] = (df[['landmark_opencv_46_x', 'landmark_dlib_46_x']].mean(axis=1) - df[['landmark_opencv_37_x', 'landmark_dlib_37_x']].mean(axis=1)) / df['face_size_x']
+    df['rel_eye_distance_y'] = (df[['landmark_opencv_46_y', 'landmark_dlib_46_y']].mean(axis=1) - df[['landmark_opencv_37_y', 'landmark_dlib_37_y']].mean(axis=1)) / df['face_size_y']
+    df['rel_left_pupil_x'] = (df.left_pupil_x - df.left_eye_x1) / (df.left_eye_x2 - df.left_eye_x1)
+    df['rel_left_pupil_y'] = (df.left_pupil_y - df.left_eye_y1) / (df.left_eye_y2 - df.left_eye_y1)
+    df['rel_right_pupil_x'] = (df.right_pupil_x - df.right_eye_x1) / (df.right_eye_x2 - df.right_eye_x1)
+    df['rel_right_pupil_y'] = (df.right_pupil_y - df.right_eye_y1) / (df.right_eye_y2 - df.right_eye_y1)
 
 def generate_features_for_datasets(input_root, output_root):
     landmark_path, datasets = get_latest_landmarks(input_root)
@@ -69,12 +86,12 @@ def generate_features_for_datasets(input_root, output_root):
         for (features_name, features_func) in [
             ('dlib', include_output_features_dlib),
             ('opencv', include_output_features_opencv),
-            # ('landmark_avg', include_output_features_avg),
+            ('landmark_avg', include_output_features_avg),
         ]:
             generate_features("{}/raw/{}/positions.csv".format(input_root, dataset),
                               "{}/{}/landmarks.csv".format(landmark_path, dataset),
                               "{}/{}_{}".format(output_root, dataset, features_name),
-                              features_calculation = features_func)
+                              features_calculation=features_func)
 
 if __name__ == '__main__':
     now = get_timestamp()
