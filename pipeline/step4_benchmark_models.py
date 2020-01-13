@@ -61,7 +61,7 @@ def benchmark_models_for_datasets(input_path, output_path):
     for grp, df in overall_groups.items():
         result += benchmark_models('overall_{}'.format(grp), features_path, df)
 
-    result += benchmark_models('overall', features_path, overall)
+    #result += benchmark_models('overall', features_path, overall)
 
     output_df = pd.DataFrame(result)
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
