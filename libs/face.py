@@ -1,3 +1,5 @@
+import datetime
+
 import dlib
 import cv2
 from imutils import face_utils
@@ -72,6 +74,8 @@ def get_face(img):
             pupil = detect_pupil(eye1_frame)
 
             face[eye_name]['bbox'] = [[eyebb_x1, eyebb_y1], [eyebb_x2, eyebb_y2]]
+
+            pupil = detect_pupil(eye1_frame)
             if pupil:
                 face[eye_name]['pupil'] = [eyebb_x1 + round(pupil.pt[0]), eyebb_y1 + round(pupil.pt[1])]
 
@@ -88,6 +92,9 @@ def generate_landmark_image(input_img, face):
     for (x, y) in face['landmarks_opencv']:
         cv2.circle(output_img, (round(x), round(y)), 2, (255, 0, 0), -1)
     for eye in ['left_eye', 'right_eye']:
+        if 'bbox' in face[eye] and face[eye]['bbox'][0][0]:
+            cv2.rectangle(output_img, pt1=tuple(face[eye]['bbox'][0]), pt2=tuple(face[eye]['bbox'][1]),
+                      color=(255, 255, 0))
         pupil = face[eye].get('pupil')
         if pupil:
             cv2.circle(output_img, tuple(pupil), 1, (0, 255, 0), 2)
