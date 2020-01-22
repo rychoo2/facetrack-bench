@@ -71,7 +71,6 @@ def get_face(img):
 
             eye1_frame = frame_final[eyebb_y1: eyebb_y2, eyebb_x1:eyebb_x2]
             eye1_frame = cv2.cvtColor(eye1_frame, cv2.COLOR_GRAY2RGB)
-            pupil = detect_pupil(eye1_frame)
 
             face[eye_name]['bbox'] = [[eyebb_x1, eyebb_y1], [eyebb_x2, eyebb_y2]]
 

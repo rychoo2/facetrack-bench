@@ -6,15 +6,15 @@ from libs.eye_landmark import detect_pupil
 
 kernel = np.ones((5,5), np.uint8)
 params = cv2.SimpleBlobDetector_Params()
-params.filterByArea = True
+params.filterByArea = False
 params.minArea = 1  # The dot in 20pt font has area of about 30
-params.filterByCircularity = True
+params.filterByCircularity = False
 params.minCircularity = 0.7
 params.filterByConvexity = False
 params.minConvexity = 0.8
-params.filterByInertia = True
+params.filterByInertia = False
 params.minInertiaRatio = 0.4
-detector = cv2.SimpleBlobDetector_create()
+detector = cv2.SimpleBlobDetector_create(params)
 
 
 def erode(img):
@@ -76,12 +76,12 @@ def detect_blobs(img):
 def imggrid(vrow):
     imggrid = [
                      vrow,
-                      [erode(i) for i in vrow],
-                      [dilate(i) for i in vrow],
-                      [cv2.morphologyEx(i, cv2.MORPH_OPEN, kernel) for i in vrow],
-                      [cv2.morphologyEx(i, cv2.MORPH_CLOSE, kernel) for i in vrow],
-                      [cv2.morphologyEx(i, cv2.MORPH_CROSS, kernel) for i in vrow],
-                      [cv2.cvtColor(cv2.Canny(i, 50, 250), cv2.COLOR_GRAY2RGB) for i in vrow],
+                      # [erode(i) for i in vrow],
+                      # [dilate(i) for i in vrow],
+                      # [cv2.morphologyEx(i, cv2.MORPH_OPEN, kernel) for i in vrow],
+                      # [cv2.morphologyEx(i, cv2.MORPH_CLOSE, kernel) for i in vrow],
+                      # [cv2.morphologyEx(i, cv2.MORPH_CROSS, kernel) for i in vrow],
+                      # [cv2.cvtColor(cv2.Canny(i, 50, 250), cv2.COLOR_GRAY2RGB) for i in vrow],
                       ]
     imggrid_3d = []
     for vr in imggrid:
@@ -94,7 +94,7 @@ def imggrid(vrow):
     return np.hstack((np.vstack(tuple(row)) for row in imggrid_3d))
 
 
-for image_file in ['./images/eye5.png', './images/eye6.png']:
+for image_file in ['./images/test_left_eye.jpg', './images/test_left_eye.png']:
     eyeimg = cv2.imread(image_file)
     # cv2.circle(eyeimg, (50, 50), 5, (255, 0,0 ), 3)
     eyeimg2 = cv2.GaussianBlur(eyeimg, (5,5), 0)
@@ -104,7 +104,7 @@ for image_file in ['./images/eye5.png', './images/eye6.png']:
 
     # eyeimg_final = cv2.morphologyEx(eyeimg_final, cv2.MORPH_OPEN, kernel)
     cv2.imshow(image_file,
-               cv2.pyrDown(imggrid([
+               imggrid([
                    eyeimg,
                    eyeimg_final,
                    draw_pupil(eyeimg),
@@ -113,26 +113,26 @@ for image_file in ['./images/eye5.png', './images/eye6.png']:
                    cv2.threshold(eyeimg_final, 0, 255, cv2.THRESH_BINARY)[1],
                    cv2.threshold(eyeimg_final, 1, 255, cv2.THRESH_BINARY)[1],
                    cv2.threshold(eyeimg_final, 5, 255, cv2.THRESH_BINARY)[1],
-                   cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 5, 0), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 5, 1), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 5, 2), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 7, 2), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 9, 2), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 11, 2), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 11, 3), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 11, 4), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 13, 1), cv2.COLOR_GRAY2RGB),
-                   cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                                      cv2.THRESH_BINARY, 13, 2), cv2.COLOR_GRAY2RGB)
-                   ])))
+                   # cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 5, 0), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 5, 1), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 5, 2), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 7, 2), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 9, 2), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 11, 2), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 11, 3), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 11, 4), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 13, 1), cv2.COLOR_GRAY2RGB),
+                   # cv2.cvtColor(cv2.adaptiveThreshold(eyeimg3, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                   #                                    cv2.THRESH_BINARY, 13, 2), cv2.COLOR_GRAY2RGB)
+                   ]))
 
 cv2.waitKey(0)

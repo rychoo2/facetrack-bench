@@ -60,7 +60,7 @@ class TestProcess_landmarks(TestCase):
         self.assertIsNotNone(face)
         self.assertTrue(len(face['landmarks_opencv']) > 0 or len(face['landmarks_dlib']) > 0)
         self.assertTrue('pupil' in face['right_eye'])
-        # self.assertTrue('pupil' in face['left_eye'])
+        self.assertTrue('pupil' in face['left_eye'])
 
 
     def test_eye_landmark_file1(self):
@@ -70,7 +70,7 @@ class TestProcess_landmarks(TestCase):
         self.assertIsNotNone(pupil)
 
     def test_eye_landmark_file2(self):
-        pupil = detect_pupil(cv2.imread('images/test_right_eye2.jpg'))
+        pupil = detect_pupil(cv2.imread('images/test_right_eye.png'))
         print(pupil)
 
         self.assertIsNotNone(pupil)

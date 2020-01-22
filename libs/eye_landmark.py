@@ -1,5 +1,11 @@
 import cv2
-detector = cv2.SimpleBlobDetector_create()
+
+params = cv2.SimpleBlobDetector_Params()
+params.filterByArea = False
+params.filterByCircularity = False
+params.filterByConvexity = False
+params.filterByInertia = False
+detector = cv2.SimpleBlobDetector_create(params)
 
 def detect_pupil(img):
     img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
