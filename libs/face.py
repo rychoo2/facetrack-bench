@@ -29,7 +29,7 @@ def get_face(img):
     frame_processed = cv2.equalizeHist(frame_processed)
 
     frame_final = frame_processed
-    faces_cv2 = face_cascade.detectMultiScale(frame_final)
+    faces_cv2 = face_cascade.detectMultiScale(frame_final, minSize=(int(0.1 * frame_final.shape[0]), int(0.1 * frame_final.shape[1])))
     primary_face_csv2_index, primary_face_csv2 = get_largest_shape([dict(x=x, y=y, width=w, height=h) for (x, y, w, h) in faces_cv2])
     faces_dlib = face_detector(frame_final, 1)
     primary_face_dlib_index, primary_face_dlib = get_largest_shape(
@@ -56,7 +56,8 @@ def get_face(img):
         face['landmarks_dlib'] = shape.tolist()
 
     if None not in face['bbox_opencv'][0]:
-        ok, landmarks2 = facemark.fit(frame_final, faces=faces_cv2)
+        ok, landmarks2 = facemark.fit(frame_final, faces=faces_cv2[primary_face_csv2_index: primary_face_csv2_index+1])
+        #here is the bug taking first landmars rather than largest
         face['landmarks_opencv'] = [[int(x[0]), int(x[1])] for x in landmarks2[0][0]]
 
     face_landmarks = face['landmarks_dlib'] or face['landmarks_opencv']
