@@ -5,7 +5,7 @@ import collections
 
 from sklearn.model_selection import train_test_split
 
-from libs.utils import get_latest_features, get_timestamp
+from libs.utils import get_latest_features, get_timestamp, training_columns, target_columns
 from pipeline.models import CenterOfScreenModel, NNSequentialKerasBasic, NNSequentialKerasBasic0, LinearRegressionBasic, \
     LinearRidgeBasic, LinearLassoBasic, LinearElasticNetBasic, SklearnCustom, PLSRegression, BaggingRegressor, \
     ExtraTreesRegressor, RandomForestRegressorBasic, MultiTaskLassoCV, MLPRegressor, DecisionTreeRegressor, \
@@ -33,11 +33,6 @@ models = [
     SklearnCustom(),
 ]
 
-training_columns = ['rel_face_x', 'rel_face_y', 'rel_face_size_x', 'rel_face_size_y', 'rel_pose_x', 'rel_pose_y',
-                      'rel_eye_distance_x', 'rel_eye_distance_y', 'rel_left_pupil_x', 'rel_left_pupil_y',
-                      'rel_right_pupil_x', 'rel_right_pupil_y']
-
-target_columns = ['rel_target_x', 'rel_target_y']
 
 
 def benchmark_models_for_datasets(input_path, output_path):

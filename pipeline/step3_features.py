@@ -16,6 +16,7 @@ def generate_features(raw_path, landmark_path, output_path, features_calculation
     df['raw_path'] = os.path.relpath(raw_path)
 
     features_calculation(df)
+    include_target_features(df)
 
     output_df = df[['raw_path', 'landmark_path', 'rel_target_x', 'rel_target_y', 'timestamp',
                                     'rel_face_x', 'rel_face_y', 'rel_face_size_x', 'rel_face_size_y',
@@ -26,9 +27,11 @@ def generate_features(raw_path, landmark_path, output_path, features_calculation
     os.makedirs(output_path)
     output_df.to_csv("{}/features.csv".format(output_path))
 
-def include_output_features_dlib(df):
+def include_target_features(df):
     df['rel_target_x'] = df.gaze_x / df.screen_width
     df['rel_target_y'] = df.gaze_y / df.screen_height
+
+def include_output_features_dlib(df):
     df['rel_face_x'] = df.face_dlib_x1 / df.img_width
     df['rel_face_y'] = df.face_dlib_y1 / df.img_height
     df['face_size_x'] = (df.face_dlib_x2 - df.face_dlib_x1)
@@ -45,8 +48,6 @@ def include_output_features_dlib(df):
     df['rel_right_pupil_y'] = (df.right_pupil_y - df.right_eye_y1) / (df.right_eye_y2 - df.right_eye_y1)
 
 def include_output_features_opencv(df):
-    df['rel_target_x'] = df.gaze_x / df.screen_width
-    df['rel_target_y'] = df.gaze_y / df.screen_height
     df['rel_face_x'] = df.face_opencv_x1 / df.img_width
     df['rel_face_y'] = df.face_opencv_y1 / df.img_height
     df['face_size_x'] = (df.face_opencv_x2 - df.face_opencv_x1)
@@ -63,8 +64,6 @@ def include_output_features_opencv(df):
     df['rel_right_pupil_y'] = (df.right_pupil_y - df.right_eye_y1) / (df.right_eye_y2 - df.right_eye_y1)
 
 def include_output_features_avg(df):
-    df['rel_target_x'] = df.gaze_x / df.screen_width
-    df['rel_target_y'] = df.gaze_y / df.screen_height
     df['rel_face_x'] = df[['face_opencv_x1', 'face_dlib_x1']].mean(axis=1) / df.img_width
     df['rel_face_y'] = df[['face_opencv_y1', 'face_dlib_y1']].mean(axis=1)/ df.img_height
     df['face_size_x'] = (df[['face_opencv_x2', 'face_dlib_x2']].mean(axis=1) - df[['face_opencv_x1', 'face_dlib_x1']].mean(axis=1))

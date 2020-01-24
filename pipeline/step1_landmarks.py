@@ -16,42 +16,54 @@ def process_landmarks(input_path, output_path):
             basefilename = f.replace(input_path + "/", "")
 
             if header:
-                row = list(itertools.chain.from_iterable([['filename', 'img_width', 'img_height'],
-                                                          ['face_dlib_x1', 'face_dlib_y1', 'face_dlib_x2', 'face_dlib_y2'],
-                                                          ['face_opencv_x1', 'face_opencv_y1', 'face_opencv_x2', 'face_opencv_y2'],
-                                                          *[("landmark_dlib_{}_x".format(i), "landmark_dlib_{}_y".format(i)) for i in range(1, 69)],
-                                                          *[("landmark_opencv_{}_x".format(i), "landmark_opencv_{}_y".format(i)) for i in range(1, 69)],
-                                                          ["left_eye_x1", "left_eye_y1", "left_eye_x2", "left_eye_y2"],
-                                                          ["right_eye_x1", "right_eye_y1", "right_eye_x2", "right_eye_y2"],
-                                                          ["left_pupil_x", "left_pupil_y", "right_pupil_x", "right_pupil_y"]]
-
-                ))
+                row = create_landmarks_header()
                 fw.write("{}\n".format(','.join(row)))
                 header = False
 
-            row_common = [basefilename, str(img.shape[1]), str(img.shape[0])]
-
-            row = row_common.copy()
-            row += face['bbox_dlib'][0]
-            row += face['bbox_dlib'][1]
-            row += face['bbox_opencv'][0]
-            row += face['bbox_opencv'][1]
-            for i in range(0,68):
-                landmark_x, landmark_y = face['landmarks_dlib'][i] if i < len(face['landmarks_dlib']) else [None, None]
-                row += [landmark_x, landmark_y]
-            for i in range(0,68):
-                landmark_x, landmark_y = face['landmarks_opencv'][i] if i < len(face['landmarks_opencv']) else [None, None]
-                row += [landmark_x, landmark_y]
-            for eye in ['left_eye', 'right_eye']:
-                row += face[eye]['bbox'][0]
-                row += face[eye]['bbox'][1]
-            for eye in ['left_eye', 'right_eye']:
-                pupil = face[eye].get('pupil')
-                row += [pupil and pupil[0] or '', pupil and pupil[1] or '']
+            row = create_landmarks_row(face, basefilename)
             fw.write("{}\n".format(','.join([xstr(x) for x in row])))
             fw.flush()
 
             save_landmark_image(img, face, "{}/{}".format(output_path, basefilename))
+
+def create_landmarks_row(face, basefilename):
+
+    row_common = [basefilename, face['img_width'], face['img_height']]
+
+    row = row_common.copy()
+    row += face['bbox_dlib'][0]
+    row += face['bbox_dlib'][1]
+    row += face['bbox_opencv'][0]
+    row += face['bbox_opencv'][1]
+    for i in range(0, 68):
+        landmark_x, landmark_y = face['landmarks_dlib'][i] if i < len(face['landmarks_dlib']) else [None, None]
+        row += [landmark_x, landmark_y]
+    for i in range(0, 68):
+        landmark_x, landmark_y = face['landmarks_opencv'][i] if i < len(face['landmarks_opencv']) else [None, None]
+        row += [landmark_x, landmark_y]
+    for eye in ['left_eye', 'right_eye']:
+        row += face[eye]['bbox'][0]
+        row += face[eye]['bbox'][1]
+    for eye in ['left_eye', 'right_eye']:
+        pupil = face[eye].get('pupil')
+        row += [pupil and pupil[0] or None, pupil and pupil[1] or None]
+
+    return row
+
+def create_landmarks_header():
+    return list(itertools.chain.from_iterable([['filename', 'img_width', 'img_height'],
+                                        ['face_dlib_x1', 'face_dlib_y1', 'face_dlib_x2', 'face_dlib_y2'],
+                                        ['face_opencv_x1', 'face_opencv_y1', 'face_opencv_x2',
+                                         'face_opencv_y2'],
+                                        *[("landmark_dlib_{}_x".format(i), "landmark_dlib_{}_y".format(i)) for
+                                          i in range(1, 69)],
+                                        *[("landmark_opencv_{}_x".format(i), "landmark_opencv_{}_y".format(i))
+                                          for i in range(1, 69)],
+                                        ["left_eye_x1", "left_eye_y1", "left_eye_x2", "left_eye_y2"],
+                                        ["right_eye_x1", "right_eye_y1", "right_eye_x2", "right_eye_y2"],
+                                        ["left_pupil_x", "left_pupil_y", "right_pupil_x", "right_pupil_y"]]
+
+                                       ))
 
 def xstr(s):
     if s is None:

@@ -35,16 +35,18 @@ def get_face(img):
     primary_face_dlib_index, primary_face_dlib = get_largest_shape(
         [dict(x=rect.left(), y=rect.top(), width=rect.width(), height=rect.height()) for rect in faces_dlib])
 
-    face = dict(bbox_dlib=[[primary_face_dlib['x'], primary_face_dlib['y']],
+    face = dict(
+        img_width = img.shape[1], img_height = img.shape[0],
+        bbox_dlib=[[primary_face_dlib['x'], primary_face_dlib['y']],
                       [primary_face_dlib['x'] + primary_face_dlib['width'],
                        primary_face_dlib['y'] + primary_face_dlib['height']]] if primary_face_dlib else [[None, None], [None, None]],
-                bbox_opencv=[[primary_face_csv2['x'], primary_face_csv2['y']],
-                       [primary_face_csv2['x'] + primary_face_csv2['width'],
-                        primary_face_csv2['y'] + primary_face_csv2['height']]] if primary_face_csv2 else [[None, None], [None, None]],
-                landmarks_dlib=[],
-                landmarks_opencv=[],
-                left_eye=dict(bbox=[[None, None], [None, None]]),
-                right_eye=dict(bbox=[[None, None], [None, None]]))
+        bbox_opencv=[[primary_face_csv2['x'], primary_face_csv2['y']],
+               [primary_face_csv2['x'] + primary_face_csv2['width'],
+                primary_face_csv2['y'] + primary_face_csv2['height']]] if primary_face_csv2 else [[None, None], [None, None]],
+        landmarks_dlib=[],
+        landmarks_opencv=[],
+        left_eye=dict(bbox=[[None, None], [None, None]]),
+        right_eye=dict(bbox=[[None, None], [None, None]]))
 
     if None not in face['bbox_dlib'][0]:
 
@@ -65,10 +67,10 @@ def get_face(img):
     if len(face_landmarks) > 0:
         for (eye_name, eye_bb) in [('right_eye', cv2.boundingRect(np.array(face_landmarks[36: 41]))),
                                    ('left_eye', cv2.boundingRect(np.array(face_landmarks[42: 47])))]:
-            eyebb_y1, eyebb_y2, eyebb_x1, eyebb_x2 = eye_bb[1] - int(0.8 * eye_bb[3]), \
-                                                     eye_bb[1] + int(1.8 * eye_bb[3]), \
-                                                     eye_bb[0] - int(0.8 * eye_bb[2]), \
-                                                     eye_bb[0] + int(1.8 * eye_bb[2])
+            eyebb_y1, eyebb_y2, eyebb_x1, eyebb_x2 = eye_bb[1] - int(0.5 * eye_bb[3]), \
+                                                     eye_bb[1] + int(1.5 * eye_bb[3]), \
+                                                     eye_bb[0] - int(0.5 * eye_bb[2]), \
+                                                     eye_bb[0] + int(1.5 * eye_bb[2])
 
             eye1_frame = frame_final[eyebb_y1: eyebb_y2, eyebb_x1:eyebb_x2]
             eye1_frame = cv2.cvtColor(eye1_frame, cv2.COLOR_GRAY2RGB)

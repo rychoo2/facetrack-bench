@@ -1,6 +1,12 @@
 import datetime
 import os
 
+training_columns = ['rel_face_x', 'rel_face_y', 'rel_face_size_x', 'rel_face_size_y', 'rel_pose_x', 'rel_pose_y',
+                      'rel_eye_distance_x', 'rel_eye_distance_y', 'rel_left_pupil_x', 'rel_left_pupil_y',
+                      'rel_right_pupil_x', 'rel_right_pupil_y']
+
+target_columns = ['rel_target_x', 'rel_target_y']
+
 def get_timestamp():
     return datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')[:-3]
 
@@ -24,4 +30,6 @@ def get_datasets(input_root):
     return raw_input_path, list_dirs(raw_input_path)
 
 def list_dirs(path):
-    return os.listdir(path)
+    return [x for x in os.listdir(path) if not '.DS_Store' in x]
+
+
