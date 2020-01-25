@@ -24,7 +24,7 @@ screen_height = root.winfo_screenheight()
 
 cam = cv2.VideoCapture(0)
 
-training_features_path = os.path.dirname(os.path.realpath(__file__)) + "/../train_data/features/20200124150502463/20200124150007093_landmark_avg/features.csv"
+training_features_path = os.path.dirname(os.path.realpath(__file__)) + "/../train_data/features/20200124181140939/20200124175712535_opencv/features.csv"
 features_func = include_output_features_dlib
 
 def load_training_data():
@@ -60,11 +60,14 @@ def main():
         features, output_img = generate_features(img)
 
         features.dropna(inplace=True)
-        print(features)
         if features.shape[0] > 0:
             prediction = model.predict(features)[0]
-            move_mouse(prediction[0]*screen_width, prediction[1] * screen_height)
-            cv2.circle(output_img, (int(prediction[0] * img.shape[0]), int(prediction[1] * img.shape[1])), radius=20, color=(255, 0, 0))
+            print(prediction)
+            # move_mouse(prediction[0] * screen_width, prediction[1] * screen_height)
+            cv2.circle(output_img, (int(prediction[0] * img.shape[1]), int(prediction[0] * img.shape[0])), radius=20, color=(255, 255, 255))
+            print((int(prediction[0] * img.shape[1]), int(prediction[0] * img.shape[0])))
+        else:
+            print(None)
         if cv2.waitKey(1) == 27:
             break  # esc to quit
         cv2.imshow("output", output_img)
