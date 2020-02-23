@@ -79,22 +79,78 @@ def get_dataset_groups(datasets):
 
 def benchmark_models(dataset_name, filename, df):
     result = []
-    train_data = {
-        None: prepare_dataframe(df),
-        'x': prepare_dataframe(df, 'x'),
-        'y': prepare_dataframe(df, 'y')}
+    train_input, train_target, test_input, test_target = prepare_dataframe(df)
+    train_input_x, train_target_x, test_input_x, test_target_x = (d[[c for c in d.columns if c.endswith('x')]]
+                                                                  for d in (train_input, train_target, test_input, test_target))
+    train_input_y, train_target_y, test_input_y, test_target_y = (d[[c for c in d.columns if c.endswith('y')]]
+                                                                  for d in (train_input, train_target, test_input, test_target))
+
+    train_input_y2, train_target_y2, test_input_y2, test_target_y2 = (
+        train_input, train_target[[c for c in train_target.columns if c.endswith('y')]],
+        test_input, test_target[[c for c in test_target.columns if c.endswith('y')]])
+
     for modelClass in models:
-        for axis in [None, 'x', 'y']:
-            train_input, train_target, test_input, test_target = train_data[axis]
-            model = modelClass()
-            model.train(train_input, train_target)
-            train_output = model.predict(train_input)
-            test_output = model.predict(test_input)
-            train_benchmark = model.evaluate(train_output, train_target)
-            test_benchmark = model.evaluate(test_output, test_target)
-            result.append([os.path.relpath(filename), dataset_name if not axis else '{}_{}'.format(dataset_name, axis),
-                           model.name, len(df.index), train_benchmark, test_benchmark])
+        model = modelClass()
+        model.train(train_input, train_target)
+        train_output = model.predict(train_input)
+        test_output = model.predict(test_input)
+        train_benchmark = model.evaluate(train_output, train_target)
+        test_benchmark = model.evaluate(test_output, test_target)
+        result.append([os.path.relpath(filename), dataset_name,
+                       model.name, len(df.index), train_benchmark, test_benchmark])
+
+        model_x = modelClass()
+        model_x.train(train_input_x, train_target_x)
+        train_output_x = model_x.predict(train_input_x)
+        test_output_x = model_x.predict(test_input_x)
+        train_benchmark_x = model_x.evaluate(train_output_x, train_target_x)
+        test_benchmark_x = model_x.evaluate(test_output_x, test_target_x)
+        result.append([os.path.relpath(filename), dataset_name + '_x',
+                       model.name, len(df.index), train_benchmark_x, test_benchmark_x])
+
+        model_y = modelClass()
+        model_y.train(train_input_y, train_target_y)
+        train_output_y = model_y.predict(train_input_y)
+        test_output_y = model_y.predict(test_input_x)
+        train_benchmark_y = model_y.evaluate(train_output_y, train_target_y)
+        test_benchmark_y = model_y.evaluate(test_output_y, test_target_y)
+        result.append([os.path.relpath(filename), dataset_name + '_y',
+                       model.name, len(df.index), train_benchmark_y, test_benchmark_y])
+
+        model_y2 = modelClass()
+        model_y2.train(train_input_y2, train_target_y2)
+        train_output_y2 = model_y2.predict(train_input_y2)
+        test_output_y2 = model_y2.predict(test_input_y2)
+        train_benchmark_y2 = model_y2.evaluate(train_output_y2, train_target_y2)
+        test_benchmark_y2 = model_y2.evaluate(test_output_y2, test_target_y2)
+        result.append([os.path.relpath(filename), dataset_name + '_y2',
+                       model.name, len(df.index), train_benchmark_y2, test_benchmark_y2])
+
+        train_benchmark_xy = model.evaluate(np.concatenate([normalize_dims(train_output_x),
+                                                            normalize_dims(train_output_y)], axis=1),
+                                            pd.concat([train_target_x, train_target_y], axis=1))
+        test_benchmark_xy = model.evaluate(np.concatenate([normalize_dims(test_output_x),
+                                                           normalize_dims(test_output_y)], axis=1),
+                                           pd.concat([test_target_x, test_target_y], axis=1))
+        result.append([os.path.relpath(filename), dataset_name + '_xy',
+                       model.name, len(df.index), train_benchmark_xy, test_benchmark_xy])
+
+        train_benchmark_xy2 = model.evaluate(np.concatenate([normalize_dims(train_output_x),
+                                                            normalize_dims(train_output_y2)], axis=1),
+                                            pd.concat([train_target_x, train_target_y2], axis=1))
+        test_benchmark_xy2 = model.evaluate(np.concatenate([normalize_dims(test_output_x),
+                                                           normalize_dims(test_output_y2)], axis=1),
+                                           pd.concat([test_target_x, test_target_y2], axis=1))
+        result.append([os.path.relpath(filename), dataset_name + '_xy2',
+                       model.name, len(df.index), train_benchmark_xy2, test_benchmark_xy2])
+
     return result
+
+def normalize_dims(ndarray):
+    if len(np.shape(ndarray))>1:
+        return ndarray
+    else:
+        return np.expand_dims(ndarray, axis=1)
 
 def prepare_dataframe(df, axis=None):
     df.dropna(subset=target_columns, inplace=True)
