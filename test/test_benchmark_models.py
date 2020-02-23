@@ -24,7 +24,32 @@ class TestBenchmark_models(TestCase):
             set(output.dataset.unique()),
             {'capture0_dlib', 'capture0_opencv', 'capture1_dlib', 'capture1_opencv', 'overall_dlib',
              'overall_opencv', 'capture2_dlib', 'capture2_opencv',
-             'capture2_landmark_avg', 'capture1_landmark_avg', 'overall_avg', 'capture0_landmark_avg' }
+             'capture2_landmark_avg', 'capture1_landmark_avg', 'overall_avg', 'capture0_landmark_avg',
+             'capture2_landmark_avg_x',
+             'capture1_opencv_y',
+             'capture1_landmark_avg_x',
+             'overall_avg_x',
+             'capture2_opencv_y',
+             'capture0_dlib_x',
+             'capture1_opencv_x',
+             'overall_opencv_y',
+             'overall_dlib_y',
+             'overall_dlib_x',
+             'capture2_opencv_x',
+             'overall_opencv_x',
+             'capture0_landmark_avg_x',
+             'capture2_dlib_x',
+             'capture1_dlib_y',
+             'capture1_dlib_x',
+             'capture1_landmark_avg_y',
+             'capture0_dlib_y',
+             'capture2_dlib_y',
+             'capture2_landmark_avg_y',
+             'capture0_opencv_y',
+             'overall_avg_y',
+             'capture0_opencv_x',
+             'capture0_landmark_avg_y'
+             }
         )
 
         # should be 'quick'

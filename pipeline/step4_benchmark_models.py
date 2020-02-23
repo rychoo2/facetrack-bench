@@ -16,21 +16,21 @@ pd.options.display.float_format = "{:.4f}".format
 train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data"
 
 models = [
-    CenterOfScreenModel(),
+    CenterOfScreenModel,
     #NNSequentialKerasBasic(), NNSequentialKerasBasic0(),
-    LinearRegressionBasic(),
-    LinearRidgeBasic(),
-    LinearLassoBasic(),
-    LinearElasticNetBasic(),
-    PLSRegression(),
-    BaggingRegressor(),
-    ExtraTreesRegressor(),
-    RandomForestRegressorBasic(),
-    MultiTaskLassoCV(),
-    MLPRegressor(),
-    DecisionTreeRegressor(),
-    ExtraTreeRegressor(),
-    SklearnCustom(),
+    LinearRegressionBasic,
+    LinearRidgeBasic,
+    LinearLassoBasic,
+    LinearElasticNetBasic,
+    PLSRegression,
+    BaggingRegressor,
+    ExtraTreesRegressor,
+    RandomForestRegressorBasic,
+    MultiTaskLassoCV,
+    MLPRegressor,
+    DecisionTreeRegressor,
+    ExtraTreeRegressor,
+    SklearnCustom,
 ]
 
 
@@ -79,22 +79,34 @@ def get_dataset_groups(datasets):
 
 def benchmark_models(dataset_name, filename, df):
     result = []
-    train_x, train_y, test_x, test_y = prepare_dataframe(df)
-    for model in models:
-        model.train(train_x, train_y)
-        train_output = model.predict(train_x)
-        test_output = model.predict(test_x)
-        train_benchmark = model.evaluate(train_output, train_y)
-        test_benchmark = model.evaluate(test_output, test_y)
-        result.append([os.path.relpath(filename), dataset_name, model.name, len(df.index), train_benchmark, test_benchmark])
+    train_data = {
+        None: prepare_dataframe(df),
+        'x': prepare_dataframe(df, 'x'),
+        'y': prepare_dataframe(df, 'y')}
+    for modelClass in models:
+        for axis in [None, 'x', 'y']:
+            train_input, train_target, test_input, test_target = train_data[axis]
+            model = modelClass()
+            model.train(train_input, train_target)
+            train_output = model.predict(train_input)
+            test_output = model.predict(test_input)
+            train_benchmark = model.evaluate(train_output, train_target)
+            test_benchmark = model.evaluate(test_output, test_target)
+            result.append([os.path.relpath(filename), dataset_name if not axis else '{}_{}'.format(dataset_name, axis),
+                           model.name, len(df.index), train_benchmark, test_benchmark])
     return result
 
-def prepare_dataframe(df):
+def prepare_dataframe(df, axis=None):
     df.dropna(subset=target_columns, inplace=True)
     df.fillna(0.5, inplace=True)
     train, test = train_test_split(df, test_size=0.2, random_state=0)
-    return (train[training_columns], train[target_columns],
-            test[training_columns], test[target_columns])
+    _training_columns = training_columns
+    _target_columns = target_columns
+    if axis:
+        _training_columns = [c for c in _training_columns if c.endswith(axis)]
+        _target_columns = [c for c in _target_columns if c.endswith(axis)]
+    return (train[_training_columns], train[_target_columns],
+            test[_training_columns], test[_target_columns])
 
 if __name__ == '__main__':
     now = get_timestamp()
