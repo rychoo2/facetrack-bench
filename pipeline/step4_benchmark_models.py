@@ -17,17 +17,17 @@ train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data"
 
 models = [
     CenterOfScreenModel,
-    #NNSequentialKerasBasic(), NNSequentialKerasBasic0(),
-    LinearRegressionBasic,
-    LinearRidgeBasic,
-    LinearLassoBasic,
-    LinearElasticNetBasic,
-    PLSRegression,
+#    NNSequentialKerasBasic, NNSequentialKerasBasic0,
+#     LinearRegressionBasic,
+    # LinearRidgeBasic,
+    # LinearLassoBasic,
+    # LinearElasticNetBasic,
+    # PLSRegression,
     BaggingRegressor,
     ExtraTreesRegressor,
     RandomForestRegressorBasic,
-    MultiTaskLassoCV,
-    MLPRegressor,
+    # MultiTaskLassoCV,
+    # MLPRegressor,
     DecisionTreeRegressor,
     ExtraTreeRegressor,
     SklearnCustom,
@@ -85,6 +85,10 @@ def benchmark_models(dataset_name, filename, df):
     train_input_y, train_target_y, test_input_y, test_target_y = (d[[c for c in d.columns if c.endswith('y')]]
                                                                   for d in (train_input, train_target, test_input, test_target))
 
+    train_input_x2, train_target_x2, test_input_x2, test_target_x2 = (
+        train_input, train_target[[c for c in train_target.columns if c.endswith('x')]],
+        test_input, test_target[[c for c in test_target.columns if c.endswith('x')]])
+
     train_input_y2, train_target_y2, test_input_y2, test_target_y2 = (
         train_input, train_target[[c for c in train_target.columns if c.endswith('y')]],
         test_input, test_target[[c for c in test_target.columns if c.endswith('y')]])
@@ -117,6 +121,15 @@ def benchmark_models(dataset_name, filename, df):
         result.append([os.path.relpath(filename), dataset_name + '_y',
                        model.name, len(df.index), train_benchmark_y, test_benchmark_y])
 
+        model_x2 = modelClass()
+        model_x2.train(train_input_x2, train_target_x2)
+        train_output_x2 = model_x2.predict(train_input_x2)
+        test_output_x2 = model_x2.predict(test_input_x2)
+        train_benchmark_x2 = model_x2.evaluate(train_output_x2, train_target_x2)
+        test_benchmark_x2 = model_x2.evaluate(test_output_x2, test_target_x2)
+        result.append([os.path.relpath(filename), dataset_name + '_x2',
+                       model.name, len(df.index), train_benchmark_x2, test_benchmark_x2])
+
         model_y2 = modelClass()
         model_y2.train(train_input_y2, train_target_y2)
         train_output_y2 = model_y2.predict(train_input_y2)
@@ -125,6 +138,8 @@ def benchmark_models(dataset_name, filename, df):
         test_benchmark_y2 = model_y2.evaluate(test_output_y2, test_target_y2)
         result.append([os.path.relpath(filename), dataset_name + '_y2',
                        model.name, len(df.index), train_benchmark_y2, test_benchmark_y2])
+
+
 
         train_benchmark_xy = model.evaluate(np.concatenate([normalize_dims(train_output_x),
                                                             normalize_dims(train_output_y)], axis=1),
@@ -135,14 +150,26 @@ def benchmark_models(dataset_name, filename, df):
         result.append([os.path.relpath(filename), dataset_name + '_xy',
                        model.name, len(df.index), train_benchmark_xy, test_benchmark_xy])
 
+
         train_benchmark_xy2 = model.evaluate(np.concatenate([normalize_dims(train_output_x),
                                                             normalize_dims(train_output_y2)], axis=1),
                                             pd.concat([train_target_x, train_target_y2], axis=1))
         test_benchmark_xy2 = model.evaluate(np.concatenate([normalize_dims(test_output_x),
                                                            normalize_dims(test_output_y2)], axis=1),
                                            pd.concat([test_target_x, test_target_y2], axis=1))
+
         result.append([os.path.relpath(filename), dataset_name + '_xy2',
                        model.name, len(df.index), train_benchmark_xy2, test_benchmark_xy2])
+
+        train_benchmark_x2y2 = model.evaluate(np.concatenate([normalize_dims(train_output_x2),
+                                                              normalize_dims(train_output_y2)], axis=1),
+                                              pd.concat([train_target_x2, train_target_y2], axis=1))
+        test_benchmark_x2y2 = model.evaluate(np.concatenate([normalize_dims(test_output_x2),
+                                                             normalize_dims(test_output_y2)], axis=1),
+                                             pd.concat([test_target_x2, test_target_y2], axis=1))
+
+        result.append([os.path.relpath(filename), dataset_name + '_x2y2',
+                   model.name, len(df.index), train_benchmark_x2y2, test_benchmark_x2y2])
 
     return result
 

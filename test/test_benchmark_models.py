@@ -90,7 +90,7 @@ class TestBenchmark_models(TestCase):
 
         # should be 'quick'
         print("took {} cpu time".format(duration))
-        self.assertLess(duration, 130)
+        self.assertLess(duration, 150)
 
 
     def readfile(self, path):
