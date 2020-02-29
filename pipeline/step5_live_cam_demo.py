@@ -65,6 +65,16 @@ def main():
             print(prediction)
             # move_mouse(prediction[0] * screen_width, prediction[1] * screen_height)
             cv2.circle(output_img, (int(prediction[0] * img.shape[1]), int(prediction[0] * img.shape[0])), radius=20, color=(255, 255, 255))
+
+            print(features.iloc[0])
+            features_debug_x =  ",".join(["{0:.2f}".format(x) for x in features[[c for c in features.columns if c.endswith('x')]].iloc[0]])
+            features_debug_y =  ",".join(["{0:.2f}".format(x) for x in features[[c for c in features.columns if c.endswith('y')]].iloc[0]])
+
+            print(features_debug_x)
+            print(features_debug_y)
+            cv2.putText(output_img,features_debug_x, (20, 30), cv2.FONT_HERSHEY_PLAIN, 2, color=(0, 0, 0))
+            cv2.putText(output_img,features_debug_y, (20, 60), cv2.FONT_HERSHEY_PLAIN, 2, color=(0, 0, 0))
+
             print((int(prediction[0] * img.shape[1]), int(prediction[0] * img.shape[0])))
         else:
             print(None)

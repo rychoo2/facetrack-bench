@@ -84,7 +84,31 @@ class TestBenchmark_models(TestCase):
              'overall_avg_xy2',
              'overall_avg_y2',
              'overall_dlib_y2',
-             'capture1_opencv_y2'
+             'capture1_opencv_y2',
+             'capture0_landmark_avg_x2',
+             'capture1_landmark_avg_x2y2',
+             'capture2_landmark_avg_x2y2',
+             'capture0_opencv_x2',
+             'capture0_dlib_x2',
+             'capture2_dlib_x2',
+             'capture2_opencv_x2y2',
+             'capture0_dlib_x2y2',
+             'capture1_landmark_avg_x2',
+             'overall_avg_x2y2',
+             'capture2_dlib_x2y2',
+             'overall_opencv_x2',
+             'capture0_landmark_avg_x2y2',
+             'overall_opencv_x2y2',
+             'capture0_opencv_x2y2',
+             'capture1_opencv_x2y2',
+             'overall_dlib_x2',
+             'capture2_landmark_avg_x2',
+             'overall_avg_x2',
+             'capture1_dlib_x2y2',
+             'capture1_dlib_x2',
+             'overall_dlib_x2y2',
+             'capture1_opencv_x2',
+             'capture2_opencv_x2'
              }
         )
 
