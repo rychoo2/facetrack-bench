@@ -18,7 +18,12 @@ class ModelBase(ABC):
 
     @staticmethod
     def evaluate(predicted, target):
-        return mean_absolute_error(target, predicted)
+        target_ndarray = target.to_numpy()
+        evaluations = [mean_absolute_error(target_ndarray, predicted)]
+        if target.shape[1] > 1:
+            for i in range(0, target.shape[1]):
+                evaluations.append(mean_absolute_error(target_ndarray[:,i], predicted[:,i]))
+        return evaluations
 
     @property
     def name(self):
