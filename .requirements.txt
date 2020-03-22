@@ -1,0 +1,5 @@
+sklearn
+keras
+tensorflow
+opencv-python
+dlib

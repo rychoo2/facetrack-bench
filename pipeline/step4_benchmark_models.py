@@ -4,10 +4,11 @@ import os
 import collections
 
 import sklearn
+from sklearn import ensemble, tree
 from sklearn.model_selection import train_test_split
 
 from libs.utils import get_latest_features, get_timestamp, training_columns, target_columns
-from pipeline.models import CenterOfScreenModel, NNSequentialKerasBasic, NNSequentialKerasBasic0
+from pipeline.models import CenterOfScreenModel #, NNSequentialKerasBasic, NNSequentialKerasBasic0
 # LinearRegressionBasic, \
 # LinearRidgeBasic, LinearLassoBasic, LinearElasticNetBasic, SklearnCustom, PLSRegression, BaggingRegressor, \
 # ExtraTreesRegressor, RandomForestRegressorBasic, MultiTaskLassoCV, MLPRegressor, DecisionTreeRegressor, \
@@ -20,15 +21,13 @@ pd.options.display.float_format = "{:.4f}".format
 train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data"
 
 models = [
-    CenterOfScreenModel(),
-    SklrearnModelBase(sklearn.ensemble.BaggingRegressor),
-    SklrearnModelBase(sklearn.ensemble.RandomForestRegressor),
-    SklrearnModelBase(sklearn.tree.DecisionTreeRegressor),
-    SklrearnModelBase(sklearn.tree.ExtraTreeRegressor),
-    SklrearnModelBase(sklearn.ensemble.ExtraTreesRegressor),
+    [CenterOfScreenModel],
+    [SklrearnModelBase, ensemble.BaggingRegressor],
+    [SklrearnModelBase, ensemble.RandomForestRegressor],
+    [SklrearnModelBase, tree.DecisionTreeRegressor],
+    [SklrearnModelBase, tree.ExtraTreeRegressor],
+    [SklrearnModelBase, ensemble.ExtraTreesRegressor],
 ]
-
-
 
 def benchmark_models_for_datasets(input_path, output_path):
     result = []
@@ -76,8 +75,8 @@ def benchmark_models(dataset_name, filename, df):
     result = []
     train_input, train_target, test_input, test_target = prepare_dataframe(df)
 
-    for modelClass in models:
-        model = modelClass
+    for modelClass, *args in models:
+        model = modelClass(*args)
         model.train(train_input, train_target)
         train_output = model.predict(train_input)
         test_output = model.predict(test_input)
