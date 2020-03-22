@@ -74,6 +74,8 @@ def get_dataset_groups(datasets):
 def benchmark_models(dataset_name, filename, df):
     result = []
     train_input, train_target, test_input, test_target = prepare_dataframe(df)
+    train_input_left, train_target_left, test_input_left, test_target_left = prepare_dataframe(df, 'left')
+    train_input_right, train_target_right, test_input_right, test_target_right = prepare_dataframe(df, 'right')
 
     for modelClass, *args in models:
         model = modelClass(*args)
@@ -83,7 +85,25 @@ def benchmark_models(dataset_name, filename, df):
         train_benchmark = model.evaluate(train_output, train_target)
         test_benchmark = model.evaluate(test_output, test_target)
         result.append([os.path.relpath(filename), dataset_name,
-                       model.name, len(df.index), train_benchmark, test_benchmark])
+                       model.name, len(train_input.index), train_benchmark, test_benchmark])
+
+        model_left = modelClass(*args)
+        model_left.train(train_input_left, train_target_left)
+        train_output_left = model_left.predict(train_input_left)
+        test_output_left = model_left.predict(test_input_left)
+        train_benchmark_left = model_left.evaluate(train_output_left, train_target_left)
+        test_benchmark_left = model_left.evaluate(test_output_left, test_target_left)
+        result.append([os.path.relpath(filename), dataset_name,
+                       model_left.name + '_left', len(train_input_left.index), train_benchmark_left, test_benchmark_left])
+
+        model_right = modelClass(*args)
+        model_right.train(train_input_right, train_target_right)
+        train_output_right = model_right.predict(train_input_right)
+        test_output_right = model_right.predict(test_input_right)
+        train_benchmark_right = model_right.evaluate(train_output_right, train_target_right)
+        test_benchmark_right = model_right.evaluate(test_output_right, test_target_right)
+        result.append([os.path.relpath(filename), dataset_name,
+                       model_right.name + '_right', len(train_input_right.index), train_benchmark_right, test_benchmark_right])
 
     return result
 
@@ -93,17 +113,21 @@ def normalize_dims(ndarray):
     else:
         return np.expand_dims(ndarray, axis=1)
 
-def prepare_dataframe(df, axis=None):
-    df.dropna(subset=target_columns, inplace=True)
-    df.fillna(0.5, inplace=True)
+def prepare_dataframe(df: pd.DataFrame, eye = None):
+    if eye == 'left':
+        excluded_eye = 'right'
+    elif eye == 'right':
+        excluded_eye = 'left'
+    else:
+        excluded_eye = None
+    if excluded_eye:
+        df = df[[c for c in df.columns if excluded_eye not in c]]
+    df = df.dropna(inplace=False)
     train, test = train_test_split(df, test_size=0.2, random_state=0)
-    _training_columns = training_columns
-    _target_columns = target_columns
-    if axis:
-        _training_columns = [c for c in _training_columns if c.endswith(axis)]
-        _target_columns = [c for c in _target_columns if c.endswith(axis)]
-    return (train[_training_columns], train[_target_columns],
-            test[_training_columns], test[_target_columns])
+
+    return (train[[c for c in df.columns if c in training_columns]], train[target_columns],
+            test[[c for c in df.columns if c in training_columns]], test[target_columns])
+
 
 if __name__ == '__main__':
     now = get_timestamp()
