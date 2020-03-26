@@ -78,6 +78,7 @@ def benchmark_models(dataset_name, filename, df):
     train_input_right, train_target_right, test_input_right, test_target_right = prepare_dataframe(df, 'right')
 
     for modelClass, *args in models:
+        print("processing dataset:{} model: ".format(dataset_name), modelClass, *args)
         model = modelClass(*args)
         model.train(train_input, train_target)
         train_output = model.predict(train_input)
@@ -105,6 +106,29 @@ def benchmark_models(dataset_name, filename, df):
         result.append([os.path.relpath(filename), dataset_name,
                        model_right.name + '_right', len(train_input_right.index), train_benchmark_right, test_benchmark_right])
 
+        train_output_merged = get_merged_eyes_dataframe(train_input_right, train_output_right, train_input_left, train_output_left)
+        test_output_merged = get_merged_eyes_dataframe(test_input_right, test_output_right, test_input_left, test_output_left)
+        train_target_merged = train_target_right.join(train_target_left,
+                              lsuffix='_l',
+                              rsuffix='_r',
+                              how='outer')
+        test_target_merged = test_target_right.join(test_target_left,
+                              lsuffix='_l',
+                              rsuffix='_r',
+                              how='outer')
+        train_target_merged['rel_target_x'] =  train_target_merged[['rel_target_x_r', 'rel_target_x_l']].mean(axis=1)
+        train_target_merged['rel_target_y'] =  train_target_merged[['rel_target_y_r', 'rel_target_y_r']].mean(axis=1)
+        test_target_merged['rel_target_x'] =  test_target_merged[['rel_target_x_r', 'rel_target_x_l']].mean(axis=1)
+        test_target_merged['rel_target_y'] =  test_target_merged[['rel_target_y_r', 'rel_target_y_r']].mean(axis=1)
+
+        train_output_with_target = train_output_merged[['x_avg', 'y_avg']].join(train_target_merged[['rel_target_x', 'rel_target_y']]).dropna()
+        test_output_with_target = test_output_merged[['x_avg', 'y_avg']].join(test_target_merged[['rel_target_x', 'rel_target_y']]).dropna()
+        train_benchmark_merged = model_right.evaluate(train_output_with_target[['x_avg', 'y_avg']].to_numpy(), train_output_with_target[['rel_target_x', 'rel_target_y']])
+        test_benchmark_merged = model_right.evaluate(test_output_with_target[['x_avg', 'y_avg']].to_numpy(), test_output_with_target[['rel_target_x', 'rel_target_y']])
+        result.append([os.path.relpath(filename), dataset_name,
+                       model_right.name + '_eye_avg', len(train_output_merged.index), train_benchmark_merged,
+                       test_benchmark_merged])
+
     return result
 
 def normalize_dims(ndarray):
@@ -127,6 +151,21 @@ def prepare_dataframe(df: pd.DataFrame, eye = None):
 
     return (train[[c for c in df.columns if c in training_columns]], train[target_columns],
             test[[c for c in df.columns if c in training_columns]], test[target_columns])
+
+def get_merged_eyes_dataframe(input_right, output_right, input_left, output_left):
+    right = input_right.copy()
+    right[['x', 'y']] = pd.DataFrame(output_right, index=right.index)
+    left = input_left.copy()
+    left[['x', 'y']] = pd.DataFrame(output_left, index=left.index)
+
+    input_merged = right.join(left,
+                              lsuffix='_l',
+                              rsuffix='_r',
+                              how='outer')
+
+    input_merged['x_avg'] = input_merged[['x_l', 'x_r']].mean(axis=1)
+    input_merged['y_avg'] = input_merged[['y_l', 'y_r']].mean(axis=1)
+    return input_merged
 
 
 if __name__ == '__main__':
