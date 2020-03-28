@@ -7,6 +7,7 @@ train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data"
 def generate_features(raw_path, landmark_path, output_path, features_calculation):
     raw_df = pd.read_csv(raw_path, names=['timestamp', 'gaze_x', 'gaze_y', 'screen_width', 'screen_height', 'filename'],
                          dtype={'timestamp': 'str'})
+    raw_df = raw_df.drop_duplicates(['filename'])
     landmark_df = pd.read_csv(landmark_path)
     df = landmark_df.set_index('filename').join(raw_df.set_index('filename'), on='filename')
     df['landmark_path'] = os.path.relpath(landmark_path)

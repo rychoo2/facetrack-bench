@@ -31,11 +31,12 @@ def on_click(x, y, button, pressed):
         print('{0} at {1} at {2}, on screen ({3},{4})'.format(
             'Pressed' if pressed else 'Released',
             (x, y), timestamp, screen_width, screen_height))
-        ret_val, img = cam.read()
-        image_path = "images/{}.jpg".format(timestamp)
-        fw.write("{},{},{},{},{},{}\n".format(timestamp, x, y, screen_width, screen_height, image_path))
-        fw.flush()
-        cv2.imwrite("{}/{}".format(output, image_path), img)
+        if pressed:
+            ret_val, img = cam.read()
+            image_path = "images/{}.jpg".format(timestamp)
+            fw.write("{},{},{},{},{},{}\n".format(timestamp, x, y, screen_width, screen_height, image_path))
+            fw.flush()
+            cv2.imwrite("{}/{}".format(output, image_path), img)
 
 if __name__ == '__main__':
     with mouse.Listener(

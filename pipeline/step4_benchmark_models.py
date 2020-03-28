@@ -21,7 +21,7 @@ pd.options.display.float_format = "{:.4f}".format
 train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data"
 
 models = [
-    [CenterOfScreenModel],
+    # [CenterOfScreenModel],
     [SklrearnModelBase, ensemble.BaggingRegressor],
     [SklrearnModelBase, ensemble.RandomForestRegressor],
     [SklrearnModelBase, tree.DecisionTreeRegressor],
@@ -42,8 +42,8 @@ def benchmark_models_for_datasets(input_path, output_path):
     for dataset in datasets:
         dataset_features_path = "{}/{}/features.csv".format(features_path, dataset)
         data = pd.read_csv(dataset_features_path)
-        overall = overall.append(data)
-        overall_groups[dataset_groups[dataset]] = overall_groups[dataset_groups[dataset]].append(data)
+        overall = overall.append(data, ignore_index=True)
+        overall_groups[dataset_groups[dataset]] = overall_groups[dataset_groups[dataset]].append(data, ignore_index=True)
 
         result += benchmark_models(dataset, dataset_features_path, data)
 
@@ -138,6 +138,7 @@ def normalize_dims(ndarray):
         return np.expand_dims(ndarray, axis=1)
 
 def prepare_dataframe(df: pd.DataFrame, eye = None):
+    res_df = df.copy()
     if eye == 'left':
         excluded_eye = 'right'
     elif eye == 'right':
@@ -145,12 +146,12 @@ def prepare_dataframe(df: pd.DataFrame, eye = None):
     else:
         excluded_eye = None
     if excluded_eye:
-        df = df[[c for c in df.columns if excluded_eye not in c]]
-    df = df.dropna(inplace=False)
-    train, test = train_test_split(df, test_size=0.2, random_state=0)
+        res_df = res_df[[c for c in res_df.columns if excluded_eye not in c]]
+    res_df.dropna(inplace=True)
+    train, test = train_test_split(res_df, test_size=0.2, random_state=0)
 
-    return (train[[c for c in df.columns if c in training_columns]], train[target_columns],
-            test[[c for c in df.columns if c in training_columns]], test[target_columns])
+    return (train[[c for c in res_df.columns if c in training_columns]], train[target_columns],
+            test[[c for c in res_df.columns if c in training_columns]], test[target_columns])
 
 def get_merged_eyes_dataframe(input_right, output_right, input_left, output_left):
     right = input_right.copy()
