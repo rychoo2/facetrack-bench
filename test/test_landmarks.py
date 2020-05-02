@@ -62,6 +62,14 @@ class TestProcess_landmarks(TestCase):
         self.assertTrue('pupil' in face['right_eye'])
         self.assertTrue('pupil' in face['left_eye'])
 
+    def test_process_for_file3_mtcnn(self):
+        img, face = generate_landmark_for_file('images/face2.jpg')
+        print(face)
+
+        save_landmark_image(img, face, 'tmp/face2.jpg')
+        self.assertIsNotNone(face)
+        self.assertTrue(len(face['landmarks_mtcnn']) > 0)
+
     def test_process_for_file3(self):
         img, face = generate_landmark_for_file('images/face3.jpg')
         print(face)

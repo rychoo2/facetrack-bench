@@ -43,7 +43,6 @@ def get_face(img):
         [dict(x=rect.left(), y=rect.top(), width=rect.width(), height=rect.height()) for rect in faces_dlib])
 
     face_mtcnn, lms = fd_mtcnn.detect_face(frame_final)
-    print(face_mtcnn, lms)
     primary_face_mtcnn_index, primary_face_mtcnn = get_largest_shape(
         [dict(x=int(x0), y=int(y0), width=int(x1-x0), height=int(y1-y0)) for (y0, x1, y1, x0, score) in face_mtcnn])
 
