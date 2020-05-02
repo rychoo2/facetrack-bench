@@ -4,7 +4,7 @@ from pipeline.step1_landmarks import generate_landmarks_for_datasets, generate_l
 import os
 import time
 import cv2
-from libs.eye_landmark import detect_pupil
+from libs.simple_eye_landmark_detector import SimpleEyeLandmarkDetector
 
 class TestProcess_landmarks(TestCase):
     test_output_path = "tmp/landmarks/1"
@@ -79,13 +79,14 @@ class TestProcess_landmarks(TestCase):
         self.assertTrue(len(face['landmarks_opencv']) > 0 or len(face['landmarks_dlib']) > 0)
 
     def test_eye_landmark_file1(self):
-        pupil = detect_pupil(cv2.imread('images/test_left_eye.jpg'))
+
+        pupil = SimpleEyeLandmarkDetector().get_landmarks(cv2.imread('images/test_left_eye.jpg'))
         print(pupil)
 
         self.assertIsNotNone(pupil)
 
     def test_eye_landmark_file2(self):
-        pupil = detect_pupil(cv2.imread('images/test_right_eye.png'))
+        pupil = SimpleEyeLandmarkDetector().get_landmarks(cv2.imread('images/test_right_eye.png'))
         print(pupil)
 
         self.assertIsNotNone(pupil)

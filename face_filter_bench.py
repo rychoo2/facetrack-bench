@@ -2,7 +2,7 @@ import random
 
 import cv2
 import numpy as np
-from libs.eye_landmark import detect_pupil
+from libs.simple_eye_landmark_detector import detect_pupil
 from libs.face import generate_landmark_image, get_face
 
 kernel = np.ones((5,5), np.uint8)
