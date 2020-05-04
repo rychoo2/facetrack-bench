@@ -35,6 +35,8 @@ def create_landmarks_row(face, basefilename):
     row += face['bbox_dlib'][1]
     row += face['bbox_opencv'][0]
     row += face['bbox_opencv'][1]
+    row += face['bbox_mtcnn'][0]
+    row += face['bbox_mtcnn'][1]
     for i in range(0, 68):
         landmark_x, landmark_y = face['landmarks_dlib'][i] if i < len(face['landmarks_dlib']) else [None, None]
         row += [landmark_x, landmark_y]
@@ -47,6 +49,9 @@ def create_landmarks_row(face, basefilename):
     for eye in ['left_eye', 'right_eye']:
         pupil = face[eye].get('pupil')
         row += [pupil and pupil[0] or None, pupil and pupil[1] or None]
+    for i in range(0, 5):
+        landmark_x, landmark_y = face['landmarks_mtcnn'][i] if i < len(face['landmarks_mtcnn']) else [None, None]
+        row += [landmark_x, landmark_y]
 
     return row
 
@@ -55,15 +60,18 @@ def create_landmarks_header():
                                         ['face_dlib_x1', 'face_dlib_y1', 'face_dlib_x2', 'face_dlib_y2'],
                                         ['face_opencv_x1', 'face_opencv_y1', 'face_opencv_x2',
                                          'face_opencv_y2'],
+                                       ['face_mtcnn_x1', 'face_mtcnn_y1', 'face_mtcnn_x2',
+                                            'face_mtcnn_y2'],
                                         *[("landmark_dlib_{}_x".format(i), "landmark_dlib_{}_y".format(i)) for
                                           i in range(1, 69)],
                                         *[("landmark_opencv_{}_x".format(i), "landmark_opencv_{}_y".format(i))
                                           for i in range(1, 69)],
                                         ["left_eye_x1", "left_eye_y1", "left_eye_x2", "left_eye_y2"],
                                         ["right_eye_x1", "right_eye_y1", "right_eye_x2", "right_eye_y2"],
-                                        ["left_pupil_x", "left_pupil_y", "right_pupil_x", "right_pupil_y"]]
-
-                                       ))
+                                        ["left_pupil_x", "left_pupil_y", "right_pupil_x", "right_pupil_y"],
+                                      * [("landmark_mtcnn_{}_x".format(i), "landmark_mtcnn_{}_y".format(i))
+                                         for i in range(1, 5)],
+                                       ]))
 
 def xstr(s):
     if s is None:
