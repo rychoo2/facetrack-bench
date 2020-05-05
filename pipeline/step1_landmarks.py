@@ -70,7 +70,7 @@ def create_landmarks_header():
                                         ["right_eye_x1", "right_eye_y1", "right_eye_x2", "right_eye_y2"],
                                         ["left_pupil_x", "left_pupil_y", "right_pupil_x", "right_pupil_y"],
                                       * [("landmark_mtcnn_{}_x".format(i), "landmark_mtcnn_{}_y".format(i))
-                                         for i in range(1, 5)],
+                                         for i in range(1, 6)],
                                        ]))
 
 def xstr(s):

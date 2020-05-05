@@ -120,8 +120,9 @@ def generate_landmark_image(input_img, face):
         cv2.circle(output_img, (round(x), round(y)), 2, (255, 0, 0), -1)
     if None not in face['bbox_mtcnn'][0]:
         cv2.rectangle(output_img, pt1=tuple(face['bbox_mtcnn'][0]), pt2=tuple(face['bbox_mtcnn'][1]), color=(0, 255, 0))
-    for (x, y) in face['landmarks_mtcnn']:
+    for i, (x, y) in enumerate(face['landmarks_mtcnn']):
         cv2.circle(output_img, (round(x), round(y)), 2, (0, 255, 0), -1)
+        cv2.putText(output_img, "{}".format(i), (round(x), round(y)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
 
     return output_img
 

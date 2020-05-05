@@ -17,7 +17,11 @@ class TestProcess_features(TestCase):
         duration = time.process_time() - start
 
         # should have 2 datasets
-        expected_datasets =  {'capture0_dlib', 'capture1_dlib', 'capture0_opencv', 'capture1_opencv', 'capture2_dlib', 'capture2_opencv', 'capture0_landmark_avg', 'capture2_landmark_avg', 'capture1_landmark_avg'}
+        expected_datasets =  {'capture0_dlib', 'capture1_dlib', 'capture0_opencv', 'capture1_opencv', 'capture2_dlib', 'capture2_opencv', 'capture0_landmark_avg', 'capture2_landmark_avg', 'capture1_landmark_avg',
+                              'capture2_mtcnn',
+                              'capture0_mtcnn',
+                              'capture1_mtcnn',
+                              }
         self.assertEqual(set(os.listdir(self.test_output_path)), expected_datasets)
 
         # should have expected landmark.csv's
