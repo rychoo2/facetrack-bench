@@ -8,6 +8,7 @@ import os
 import numpy as np
 from ext.detector.face_detector import MTCNNFaceDetector
 from keras import backend as K
+from ext.elg_keras import KerasELG
 
 curdir = os.path.dirname(os.path.realpath(__file__))
 landmarks_predictor_path = curdir + "/../../data/shape_predictor_68_face_landmarks.dat"
@@ -15,6 +16,7 @@ eyes_cascade_path = curdir + '/../../data/haarcascades/haarcascade_eye_tree_eyeg
 face_cascade_path = curdir + '/../../data/haarcascades/haarcascade_frontalface_alt2.xml'
 cv_facemarks_path = curdir + '/../../data/lbfmodel.yaml'
 mtcnn_weights_dir = "../../data/mtcnn_weights/"
+elg_weights_dir = "../../data/elg_weights/elg_keras.h5"
 facemark = cv2.face.createFacemarkLBF()
 facemark.loadModel(cv2.samples.findFile(cv_facemarks_path))
 
@@ -25,6 +27,9 @@ face_cascade.load(cv2.samples.findFile(face_cascade_path))
 eye_landmark_detector = SimpleEyeLandmarkDetector()
 
 fd_mtcnn = MTCNNFaceDetector(sess=K.get_session(), model_path=mtcnn_weights_dir)
+
+elg_model = KerasELG()
+elg_model.net.load_weights(elg_weights_dir)
 
 def get_face(img):
     frame_processed = img.copy()
@@ -82,6 +87,8 @@ def get_face(img):
 
     face_landmarks = face['landmarks_dlib'] or face['landmarks_opencv']
 
+    eye_imgs = []
+
     if len(face_landmarks) > 0:
         for (eye_name, eye_bb) in [('right_eye', cv2.boundingRect(np.array(face_landmarks[36: 41]))),
                                    ('left_eye', cv2.boundingRect(np.array(face_landmarks[42: 47])))]:
@@ -93,11 +100,16 @@ def get_face(img):
             eye1_frame = frame_final[eyebb_y1: eyebb_y2, eyebb_x1:eyebb_x2]
             # eye1_frame = cv2.cvtColor(eye1_frame, cv2.COLOR_GRAY2RGB)
 
+            eye_imgs.append(eye1_frame)
+
             face[eye_name]['bbox'] = [[eyebb_x1, eyebb_y1], [eyebb_x2, eyebb_y2]]
 
             pupil = eye_landmark_detector.get_landmarks(eye1_frame)
             if pupil:
                 face[eye_name]['pupil'] = [eyebb_x1 + round(pupil.pt[0]), eyebb_y1 + round(pupil.pt[1])]
+
+    if len(eye_imgs) > 0:
+        print(get_eye_landmarks(*eye_imgs))
 
     return face
 
@@ -136,3 +148,53 @@ def get_largest_shape(shapes):
             max_shape = shape
             max_index = index
     return max_index, max_shape
+
+def get_eye_landmarks(left_eye_im, right_eye_im):
+    inp_left = cv2.cvtColor(left_eye_im, cv2.COLOR_RGB2GRAY)
+    inp_left = cv2.equalizeHist(inp_left)
+    inp_left = cv2.resize(inp_left, (180, 108))[np.newaxis, ..., np.newaxis]
+
+    inp_right = cv2.cvtColor(right_eye_im, cv2.COLOR_RGB2GRAY)
+    inp_right = cv2.equalizeHist(inp_right)
+    inp_right = cv2.resize(inp_right, (180, 108))[np.newaxis, ..., np.newaxis]
+
+    input_array = np.concatenate([inp_left, inp_right], axis=0)
+    pred_left, pred_right = elg_model.net.predict(input_array/255 * 2 - 1)
+
+    left_landmarks = draw_pupil(left_eye_im, inp_left, elg_model._calculate_landmarks(pred_left))
+    right_landmarks = draw_pupil(right_eye_im, inp_right, elg_model._calculate_landmarks(pred_right))
+
+    cv2.imshow("test_left", left_landmarks)
+    cv2.imshow("test_right", right_landmarks)
+    cv2.waitKey()
+
+    return pred_left, pred_right
+
+def draw_pupil(im, inp_im, lms):
+    draw = im.copy()
+    lms = lms * (im.shape[1]/180, im.shape[0]/108 )
+    #draw = cv2.resize(draw, (inp_im.shape[2], inp_im.shape[1]))
+    pupil_center = np.zeros((2,))
+    pnts_outerline = []
+    pnts_innerline = []
+    stroke = 1 #inp_im.shape[1] // 12 + 1
+    for i, lm in enumerate(np.squeeze(lms)):
+        #print(lm)
+        y, x = int(lm[0]*3), int(lm[1]*3)
+
+        if i < 8:
+            draw = cv2.circle(draw, (y, x), stroke, (125,255,125), -1)
+            pnts_outerline.append([y, x])
+        elif i < 16:
+            draw = cv2.circle(draw, (y, x), stroke, (125,125,255), -1)
+            pnts_innerline.append([y, x])
+            pupil_center += (y,x)
+        elif i < 17:
+            draw = cv2.drawMarker(draw, (y, x), (255,200,200), markerType=cv2.MARKER_CROSS, markerSize=5, thickness=stroke, line_type=cv2.LINE_AA)
+        else:
+            draw = cv2.drawMarker(draw, (y, x), (255,125,125), markerType=cv2.MARKER_CROSS, markerSize=5, thickness=stroke, line_type=cv2.LINE_AA)
+    pupil_center = (pupil_center/8).astype(np.int32)
+    draw = cv2.cv2.circle(draw, (pupil_center[0], pupil_center[1]), stroke, (255,255,0), -1)
+    draw = cv2.polylines(draw, [np.array(pnts_outerline).reshape(-1,1,2)], isClosed=True, color=(125,255,125), thickness=stroke//2)
+    draw = cv2.polylines(draw, [np.array(pnts_innerline).reshape(-1,1,2)], isClosed=True, color=(125,125,255), thickness=stroke//2)
+    return cv2.resize(draw, (im.shape[1], im.shape[0]))

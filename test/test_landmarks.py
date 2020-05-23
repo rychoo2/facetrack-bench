@@ -36,7 +36,7 @@ class TestProcess_landmarks(TestCase):
         self.assertLess(duration, 250)
 
 
-    def test_process_for_file(self):
+    def  test_process_for_file(self):
         img, face = generate_landmark_for_file('images/face1.jpg')
         print(face)
 
