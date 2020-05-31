@@ -109,7 +109,9 @@ def get_face(img):
                 face[eye_name]['pupil'] = [eyebb_x1 + round(pupil.pt[0]), eyebb_y1 + round(pupil.pt[1])]
 
     if len(eye_imgs) > 0:
-        print(get_eye_landmarks(*eye_imgs))
+        left_lms, right_lms = get_eye_landmarks(*eye_imgs, face['left_eye']['bbox'][0],  face['right_eye']['bbox'][0])
+        face['left_eye']['gazeml'] = left_lms
+        face['right_eye']['gazeml'] = right_lms
 
     return face
 
@@ -119,9 +121,14 @@ def generate_landmark_image(input_img, face):
         if 'bbox' in face[eye] and face[eye]['bbox'][0][0]:
             cv2.rectangle(output_img, pt1=tuple(face[eye]['bbox'][0]), pt2=tuple(face[eye]['bbox'][1]),
                       color=(255, 255, 0))
+
         pupil = face[eye].get('pupil')
         if pupil:
             cv2.circle(output_img, tuple(pupil), 3, (255, 0, 255), 1)
+
+        if 'gazeml' in face[eye]:
+            draw_pupil(output_img, face[eye]['gazeml'])
+
     if None not in face['bbox_dlib'][0]:
         cv2.rectangle(output_img, pt1= tuple(face['bbox_dlib'][0]), pt2=tuple(face['bbox_dlib'][1]), color=(0, 0, 255))
     for (x, y) in face['landmarks_dlib']:
@@ -134,7 +141,6 @@ def generate_landmark_image(input_img, face):
         cv2.rectangle(output_img, pt1=tuple(face['bbox_mtcnn'][0]), pt2=tuple(face['bbox_mtcnn'][1]), color=(0, 255, 0))
     for i, (x, y) in enumerate(face['landmarks_mtcnn']):
         cv2.circle(output_img, (round(x), round(y)), 2, (0, 255, 0), -1)
-        cv2.putText(output_img, "{}".format(i), (round(x), round(y)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
 
     return output_img
 
@@ -149,7 +155,7 @@ def get_largest_shape(shapes):
             max_index = index
     return max_index, max_shape
 
-def get_eye_landmarks(left_eye_im, right_eye_im):
+def get_eye_landmarks(left_eye_im, right_eye_im, left_pos, right_pos):
     inp_left = cv2.cvtColor(left_eye_im, cv2.COLOR_RGB2GRAY)
     inp_left = cv2.equalizeHist(inp_left)
     inp_left = cv2.resize(inp_left, (180, 108))[np.newaxis, ..., np.newaxis]
@@ -161,40 +167,45 @@ def get_eye_landmarks(left_eye_im, right_eye_im):
     input_array = np.concatenate([inp_left, inp_right], axis=0)
     pred_left, pred_right = elg_model.net.predict(input_array/255 * 2 - 1)
 
-    left_landmarks = draw_pupil(left_eye_im, inp_left, elg_model._calculate_landmarks(pred_left))
-    right_landmarks = draw_pupil(right_eye_im, inp_right, elg_model._calculate_landmarks(pred_right))
+    left_landmarks = gazeml_landmarks(left_eye_im, pred_left, left_pos)
+    right_landmarks = gazeml_landmarks(right_eye_im, pred_right, right_pos)
 
-    cv2.imshow("test_left", left_landmarks)
-    cv2.imshow("test_right", right_landmarks)
-    cv2.waitKey()
+    return left_landmarks, right_landmarks
 
-    return pred_left, pred_right
-
-def draw_pupil(im, inp_im, lms):
-    draw = im.copy()
-    lms = lms * (im.shape[1]/180, im.shape[0]/108 )
-    #draw = cv2.resize(draw, (inp_im.shape[2], inp_im.shape[1]))
-    pupil_center = np.zeros((2,))
-    pnts_outerline = []
-    pnts_innerline = []
-    stroke = 1 #inp_im.shape[1] // 12 + 1
+def gazeml_landmarks(im, pred, offset):
+    lms = elg_model._calculate_landmarks(pred)
+    lms = lms * (im.shape[1]*3/180.0, im.shape[0]*3/108.0 )
+    lms = lms + offset
+    gazeml_lms =  {
+        'outerline': [],
+        'innerline': [],
+        'landmark_other':None,
+        'landmarks_other': [],
+        'pupilCenter': np.zeros((2,))
+    }
     for i, lm in enumerate(np.squeeze(lms)):
-        #print(lm)
-        y, x = int(lm[0]*3), int(lm[1]*3)
-
+        y, x = int(lm[0]), int(lm[1])
         if i < 8:
-            draw = cv2.circle(draw, (y, x), stroke, (125,255,125), -1)
-            pnts_outerline.append([y, x])
+            gazeml_lms['outerline'].append([y, x])
         elif i < 16:
-            draw = cv2.circle(draw, (y, x), stroke, (125,125,255), -1)
-            pnts_innerline.append([y, x])
-            pupil_center += (y,x)
+            gazeml_lms['innerline'].append([y, x])
+            gazeml_lms['pupilCenter'] += (y,x)
         elif i < 17:
-            draw = cv2.drawMarker(draw, (y, x), (255,200,200), markerType=cv2.MARKER_CROSS, markerSize=5, thickness=stroke, line_type=cv2.LINE_AA)
+            gazeml_lms['landmark_other'] = [y, x]
         else:
-            draw = cv2.drawMarker(draw, (y, x), (255,125,125), markerType=cv2.MARKER_CROSS, markerSize=5, thickness=stroke, line_type=cv2.LINE_AA)
-    pupil_center = (pupil_center/8).astype(np.int32)
-    draw = cv2.cv2.circle(draw, (pupil_center[0], pupil_center[1]), stroke, (255,255,0), -1)
-    draw = cv2.polylines(draw, [np.array(pnts_outerline).reshape(-1,1,2)], isClosed=True, color=(125,255,125), thickness=stroke//2)
-    draw = cv2.polylines(draw, [np.array(pnts_innerline).reshape(-1,1,2)], isClosed=True, color=(125,125,255), thickness=stroke//2)
-    return cv2.resize(draw, (im.shape[1], im.shape[0]))
+            gazeml_lms['landmarks_other'].append([y, x])
+    gazeml_lms['pupilCenter'] = (gazeml_lms['pupilCenter']/8).astype(np.int32)
+    return gazeml_lms
+
+
+def draw_pupil(im, lms):
+    stroke = 2
+    cv2.cv2.circle(im, tuple(lms['pupilCenter']), stroke, (255,255,0), -1)
+    cv2.polylines(im, [np.array(lms['outerline']).reshape(-1,1,2)], isClosed=True, color=(125,255,125), thickness=stroke//2)
+    cv2.polylines(im, [np.array(lms['innerline']).reshape(-1,1,2)], isClosed=True, color=(125,125,255), thickness=stroke//2)
+    cv2.drawMarker(im, tuple(lms['landmark_other']), (255, 200, 200), markerType=cv2.MARKER_CROSS, markerSize=5, thickness=stroke,
+                          line_type=cv2.LINE_AA)
+    for i, lm in enumerate(lms['landmarks_other']):
+        cv2.drawMarker(im, tuple(lm), (255, 125, 125), markerType=cv2.MARKER_CROSS, markerSize=5, thickness=stroke,
+                              line_type=cv2.LINE_AA)
+    return im
