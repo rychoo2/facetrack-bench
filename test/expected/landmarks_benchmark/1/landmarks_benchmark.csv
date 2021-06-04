@@ -39,10 +39,10 @@ data/landmarks/1/capture2/landmarks.csv,capture2,landmark_opencv_detection,0.75
 data/landmarks/1/capture2/landmarks.csv,capture2,landmark_mtcnn_detection,0.65
 data/landmarks/1/capture2/landmarks.csv,capture2,landmark_any_detection,0.95
 data/landmarks/1/capture2/landmarks.csv,capture2,eyes_detection,0.95
-data/landmarks/1/capture2/landmarks.csv,capture2,pupils_detection,0.65
+data/landmarks/1/capture2/landmarks.csv,capture2,pupils_detection,0.95
 data/landmarks/1/capture2/landmarks.csv,capture2,right_eye_detection,0.95
 data/landmarks/1/capture2/landmarks.csv,capture2,left_eye_detection,0.95
-data/landmarks/1/capture2/landmarks.csv,capture2,right_pupil_detection,0.65
+data/landmarks/1/capture2/landmarks.csv,capture2,right_pupil_detection,0.95
 data/landmarks/1/capture2/landmarks.csv,capture2,left_pupil_detection,0.95
 data/landmarks/1,overall,count,73.0
 data/landmarks/1,overall,face_dlib_detection,0.9863013698630136
@@ -54,8 +54,8 @@ data/landmarks/1,overall,landmark_opencv_detection,0.6301369863013698
 data/landmarks/1,overall,landmark_mtcnn_detection,0.9041095890410958
 data/landmarks/1,overall,landmark_any_detection,0.9863013698630136
 data/landmarks/1,overall,eyes_detection,0.9863013698630136
-data/landmarks/1,overall,pupils_detection,0.9041095890410958
+data/landmarks/1,overall,pupils_detection,0.9863013698630136
 data/landmarks/1,overall,right_eye_detection,0.9863013698630136
 data/landmarks/1,overall,left_eye_detection,0.9863013698630136
-data/landmarks/1,overall,right_pupil_detection,0.9041095890410958
+data/landmarks/1,overall,right_pupil_detection,0.9863013698630136
 data/landmarks/1,overall,left_pupil_detection,0.9863013698630136

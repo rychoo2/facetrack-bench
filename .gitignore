@@ -2,3 +2,5 @@ __pycache__/**
 train_data
 __pycache__
 test/tmp
+.idea
+.DS_Store
