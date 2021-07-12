@@ -24,9 +24,8 @@ def run_openface_feature_extraction(input_path, output_path):
     shutil.move(openface_output_path+"/images", output_path)
     landmarks_csv = openface_output_path+"/images.csv"
 
-    output_csv = merge_with_input(input_path +"/positions.csv", landmarks_csv)
-
-    shutil.move(landmarks_csv, output_path+"/landmarks.csv")
+    output_df = generate_output_df(input_path +"/positions.csv", landmarks_csv)
+    output_df.to_csv(output_path + "/landmarks.csv")
 
 
 def extract_images_from_video(videofile):
@@ -41,9 +40,13 @@ def extract_images_from_video(videofile):
         count+=1
 
 
-def merge_with_input(input_csv, landmarks_csv):
+def generate_output_df(input_csv, landmarks_csv):
     input_df = pd.read_csv(input_csv)
     landmarks_df = pd.read_csv(landmarks_csv)
+    if input_df.index.size != landmarks_df.index.size:
+        raise Exception("Input dataset length not matching with landmarks dataset")
+    merged = input_df.merge(landmarks_df, on='frame', suffixes=['', '_2'])
+    return merged
 
 
 

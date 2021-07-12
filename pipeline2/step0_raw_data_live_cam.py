@@ -15,6 +15,7 @@ now = get_timestamp()
 output = '../train_data2/raw/{}'.format(now)
 os.makedirs(output+'/images')
 fw = open('{}/positions.csv'.format(output), 'w')
+fw.write("timestamp,x,y,screen_width,screen_height,image_path\n")
 
 def on_move(x, y):
     print('Pointer moved to {0}'.format(
@@ -22,14 +23,16 @@ def on_move(x, y):
 
 def on_click(x, y, button, pressed):
     timestamp = get_timestamp()
+    frame = 0
     if pressed:
         print('{0} at {1} at {2}, on screen ({3},{4})'.format(
             'Pressed' if pressed else 'Released',
             (x, y), timestamp, screen_width, screen_height))
         if pressed:
+            frame += 1
             ret_val, img = cam.read()
-            image_path = "images/{}.jpg".format(timestamp)
-            fw.write("{},{},{},{},{},{}\n".format(timestamp, x, y, screen_width, screen_height, image_path))
+            image_path = "images/{}_{:03d}.jpg".format(timestamp, frame)
+            fw.write("{},{},{},{},{},{},{}\n".format(frame, timestamp, x, y, screen_width, screen_height, image_path))
             fw.flush()
             cv2.imwrite("{}/{}".format(output, image_path), img)
 
