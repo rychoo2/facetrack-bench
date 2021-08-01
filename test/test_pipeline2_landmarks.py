@@ -26,7 +26,7 @@ class TestProcess_landmarks(TestCase):
         for dataset in ['capture0', 'capture1', 'capture2']:
             output_df = pd.read_csv("{}/{}/landmarks.csv".format(self.test_output_path, dataset))
             expected_df = pd.read_csv("{}/{}/landmarks.csv".format(self.expected_output_path, dataset))
-            columns = ['image_path', 'screen_width', 'screen_height','gaze_0_x', 'gaze_0_y', 'gaze_0_z', 'gaze_1_x', 'gaze_1_y', 'gaze_1_z', 'gaze_angle_x', 'gaze_angle_y']
+            columns = ['frame','gaze_0_x', 'gaze_0_y', 'gaze_0_z', 'gaze_1_x', 'gaze_1_y', 'gaze_1_z', 'gaze_angle_x', 'gaze_angle_y']
 
             assert_frame_equal(output_df[columns], expected_df[columns], atol=0.02)
 

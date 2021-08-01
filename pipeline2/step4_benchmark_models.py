@@ -7,7 +7,7 @@ import sklearn
 from sklearn import ensemble, tree
 from sklearn.model_selection import train_test_split
 
-from libs.utils import get_latest_features, get_timestamp, training_columns, target_columns
+from libs.utils import get_latest_features, get_timestamp
 from pipeline.models import CenterOfScreenModel #, NNSequentialKerasBasic, NNSequentialKerasBasic0
 # LinearRegressionBasic, \
 # LinearRidgeBasic, LinearLassoBasic, LinearElasticNetBasic, SklearnCustom, PLSRegression, BaggingRegressor, \
@@ -28,6 +28,9 @@ models = [
     [SklrearnModelBase, tree.ExtraTreeRegressor],
     [SklrearnModelBase, ensemble.ExtraTreesRegressor],
 ]
+
+training_columns = []
+target_columns = []
 
 def benchmark_models_for_datasets(input_path, output_path):
     result = []
