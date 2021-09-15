@@ -20,16 +20,18 @@ def generate_features(raw_path, landmark_path, output_path):
     # features_calculation(df)
     include_target_features(df)
 
-    output_df = df[['raw_path', 'landmark_path', 'timestamp', 'image_path',
+    output_df = df[['frame',
+                    'raw_path', 'landmark_path', 'timestamp', 'image_path',
                                     # 'rel_face_x', 'rel_face_y', 'rel_face_size_x', 'rel_face_size_y',
                     'rel_target_x', 'rel_target_y',
-                    'gaze_0_x', 'gaze_0_y', 'gaze_0_z', 'gaze_1_x', 'gaze_1_y', 'gaze_1_z', 'gaze_angle_x',
-                    'gaze_angle_y', 'pose_Tx', 'pose_Ty', 'pose_Tz',
+                    'gaze_0_x', 'gaze_0_y', 'gaze_0_z', 'gaze_1_x', 'gaze_1_y', 'gaze_1_z',
+                    'gaze_angle_x','gaze_angle_y',
+                    'pose_Tx', 'pose_Ty', 'pose_Tz',
                     'pose_Rx', 'pose_Ry', 'pose_Rz'
                                     ]]
 
     os.makedirs(output_path)
-    output_df.to_csv("{}/features.csv".format(output_path))
+    output_df.to_csv("{}/features.csv".format(output_path), index=False)
 
 
 def include_target_features(df):
