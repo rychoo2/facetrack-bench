@@ -1,6 +1,6 @@
 sklearn
 keras
-tensorflow
+#tensorflow
 opencv-python
-dlib
+#dlib
 pynput
