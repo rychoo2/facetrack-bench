@@ -21,7 +21,7 @@ class TestPrediction_models(TestCase):
         generate_predictions_for_datasets("data/pipeline2", self.test_output_path)
         duration = time.process_time() - start
 
-        output = pd.read_csv("{}/predictions.csv".format(self.test_output_path))
+        output = pd.read_csv("{}/models_predictions.csv".format(self.test_output_path))
         self.assertTrue(
             len(output) > 70
         )

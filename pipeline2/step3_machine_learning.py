@@ -36,7 +36,7 @@ target_columns = ['rel_target_x', 'rel_target_y']
 
 def generate_predictions_for_datasets(input_path, output_path):
     benchmark_result = []
-    predicitons_result = []
+    predictions_df = pd.DataFrame()
     os.makedirs(output_path)
     overall = pd.DataFrame()
     overall_groups = collections.defaultdict(pd.DataFrame)
@@ -52,20 +52,19 @@ def generate_predictions_for_datasets(input_path, output_path):
         overall_groups[dataset_groups[dataset]] = overall_groups[dataset_groups[dataset]].append(data, ignore_index=True)
 
         benchmark, predictions = generate_predictions(dataset, dataset_features_path, data)
-        predicitons_result += predictions
+        predictions_df = predictions_df.append(predictions)
         benchmark_result += benchmark
 
     for grp, df in overall_groups.items():
         benchmark, predictions =  generate_predictions('overall_{}'.format(grp), features_path, df)
-        predicitons_result += predictions
+        predictions_df = predictions_df.append(predictions)
         benchmark_result += benchmark
 
     benchmarks_df = pd.DataFrame(benchmark_result)
-    # predictions_df = pd.DataFrame(predicitons_result)
-    # predictions_df.to_csv(
-    #     "{}/model_predictions.csv".format(output_path),
-    #     header=['filename', 'dataset', 'model', 'count', 'train_score', 'test_score'],
-    #     index=False)
+
+    predictions_df.to_csv(
+        "{}/models_predictions.csv".format(output_path),
+        index=False)
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
         print(benchmarks_df.drop(benchmarks_df.columns[0], axis=1))
         benchmarks_df.to_csv(
@@ -148,22 +147,26 @@ def generate_predictions(dataset_name, filename, df):
                        model_right.name + '_eye_avg', len(train_output_merged.index), train_benchmark_merged,
                        test_benchmark_merged])
 
-        # predictions_df = get_prediction_results(df, test_input, test_target, test_output, train_input, train_target,
-        #                                         train_output)
-        # predictions_df['model'] = model.name
-        # predictions_df['dataset'] = dataset_name
-        # predictions.append(predictions_df)
+        predictions_df = get_prediction_results(df, test_input, test_target, test_output, train_input, train_target,
+                                                train_output)
+        predictions_df['model'] = model.name
+        predictions_df['dataset'] = dataset_name
+        predictions = predictions.append(predictions_df)
 
     return result, predictions
 
 def get_prediction_results(df, test_input, test_target, test_output, train_input, train_target, train_output):
-    test_input[['prediction_x', 'prediction_y']] = test_output
-    test_input[['target_x', 'target_y']] = test_target
-    test_input['type'] = 'test'
-    train_input[['prediction_x', 'prediction_y']] = train_output
-    train_input[['target_x', 'target_y']] = train_target
-    train_input['type'] = 'train'
-    return df.merge(test_input).merge(train_input)
+    d1 = test_input.copy()
+    d1[['prediction_x', 'prediction_y']] = test_output
+    d1[['target_x', 'target_y']] = test_target
+    d1['type'] = 'test'
+    d2 = train_input.copy()
+    d2[['prediction_x', 'prediction_y']] = train_output
+    d2[['target_x', 'target_y']] = train_target
+    d2['type'] = 'train'
+    output_columns = ['frame', 'image_path', 'type', 'prediction_x', 'prediction_y', 'target_x', 'target_y']
+    output_df= df.merge(d1.append(d2))
+    return output_df[output_columns]
 
 def normalize_dims(ndarray):
     if len(np.shape(ndarray))>1:
