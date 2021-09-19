@@ -149,8 +149,10 @@ def generate_predictions(dataset_name, filename, df):
 
         predictions_df = get_prediction_results(df, test_input, test_target, test_output, train_input, train_target,
                                                 train_output)
-        predictions_df['model'] = model.name
-        predictions_df['dataset'] = dataset_name
+
+        predictions_df.insert(0, 'dataset', dataset_name)
+        predictions_df.insert(1, 'model', model.name)
+
         predictions = predictions.append(predictions_df)
 
     return result, predictions
