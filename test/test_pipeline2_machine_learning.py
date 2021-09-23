@@ -3,6 +3,7 @@ from unittest import TestCase
 from pipeline2.step3_machine_learning import generate_predictions_for_datasets
 import time
 import pandas as pd
+from pandas.testing import assert_frame_equal
 
 class TestPrediction_models(TestCase):
     test_output_path = "tmp/pipeline2/machine_learning/1"
@@ -21,10 +22,14 @@ class TestPrediction_models(TestCase):
         generate_predictions_for_datasets("data/pipeline2", self.test_output_path)
         duration = time.process_time() - start
 
-        output = pd.read_csv("{}/models_predictions.csv".format(self.test_output_path))
+        output_df = pd.read_csv("{}/models_predictions.csv".format(self.test_output_path))
         self.assertTrue(
-            len(output) > 70
+            len(output_df) > 70
         )
+
+        expected_df = pd.read_csv("{}/models_predictions.csv".format(self.expected_output_path))
+
+        assert_frame_equal(output_df, expected_df, atol=0.9)
 
         # should be 'quick'
         print("took {} cpu time".format(duration))

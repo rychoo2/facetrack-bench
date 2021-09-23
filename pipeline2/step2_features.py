@@ -14,21 +14,28 @@ train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data2"
 
 def generate_features(raw_path, landmark_path, output_path):
     df = generate_output_df(raw_path, landmark_path)
-    df['landmark_path'] = os.path.relpath(landmark_path)
-    df['raw_path'] = os.path.relpath(raw_path)
+    df['raw_image'] = df.apply(
+        lambda row: os.path.join(os.path.dirname(os.path.relpath(raw_path)), row['image_path']),
+        axis=1
+    )
+
+    df['landmark_image'] = df.apply(
+        lambda row: os.path.join(os.path.dirname(os.path.relpath(landmark_path)), f"images/frame_{row['frame']}.jpg" ),
+        axis=1
+    )
 
     # features_calculation(df)
     include_target_features(df)
 
     output_df = df[['frame',
-                    'raw_path', 'landmark_path', 'timestamp', 'image_path',
+                    'raw_image', 'landmark_image', 'timestamp',
                                     # 'rel_face_x', 'rel_face_y', 'rel_face_size_x', 'rel_face_size_y',
                     'rel_target_x', 'rel_target_y',
                     'gaze_0_x', 'gaze_0_y', 'gaze_0_z', 'gaze_1_x', 'gaze_1_y', 'gaze_1_z',
                     'gaze_angle_x','gaze_angle_y',
                     'pose_Tx', 'pose_Ty', 'pose_Tz',
                     'pose_Rx', 'pose_Ry', 'pose_Rz'
-                                    ]]
+                ]]
 
     os.makedirs(output_path)
     output_df.to_csv("{}/features.csv".format(output_path), index=False)

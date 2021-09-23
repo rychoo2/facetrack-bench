@@ -69,7 +69,7 @@ def generate_predictions_for_datasets(input_path, output_path):
         print(benchmarks_df.drop(benchmarks_df.columns[0], axis=1))
         benchmarks_df.to_csv(
         "{}/models_benchmark.csv".format(output_path),
-            header=['filename', 'dataset', 'model', 'count', 'train_score', 'test_score'],
+            header=['dataset', 'model_name', 'model_id', 'count', 'train_score', 'test_score'],
             index=False)
 
 
@@ -92,7 +92,7 @@ def generate_predictions(dataset_name, filename, df):
     train_input_left, train_target_left, test_input_left, test_target_left = prepare_dataframe(df, 'left')
     train_input_right, train_target_right, test_input_right, test_target_right = prepare_dataframe(df, 'right')
 
-    for modelClass, *args in models:
+    for idx, (modelClass, *args) in enumerate(models):
         print("processing dataset:{} model: ".format(dataset_name), modelClass, *args)
         model = modelClass(*args)
         model.train(train_input, train_target)
@@ -102,8 +102,8 @@ def generate_predictions(dataset_name, filename, df):
 
         train_benchmark = model.evaluate(train_output, train_target)
         test_benchmark = model.evaluate(test_output, test_target)
-        result.append([os.path.relpath(filename), dataset_name,
-                       model.name, len(train_input.index), train_benchmark, test_benchmark])
+        result.append([dataset_name,
+                       model.name, idx, len(train_input.index), train_benchmark, test_benchmark])
 
         model_left = modelClass(*args)
         model_left.train(train_input_left, train_target_left)
@@ -111,8 +111,8 @@ def generate_predictions(dataset_name, filename, df):
         test_output_left = model_left.predict(test_input_left)
         train_benchmark_left = model_left.evaluate(train_output_left, train_target_left)
         test_benchmark_left = model_left.evaluate(test_output_left, test_target_left)
-        result.append([os.path.relpath(filename), dataset_name,
-                       model_left.name + '_left', len(train_input_left.index), train_benchmark_left, test_benchmark_left])
+        result.append([dataset_name,
+                       model_left.name + '_left', idx, len(train_input_left.index), train_benchmark_left, test_benchmark_left])
 
 
         model_right = modelClass(*args)
@@ -121,8 +121,8 @@ def generate_predictions(dataset_name, filename, df):
         test_output_right = model_right.predict(test_input_right)
         train_benchmark_right = model_right.evaluate(train_output_right, train_target_right)
         test_benchmark_right = model_right.evaluate(test_output_right, test_target_right)
-        result.append([os.path.relpath(filename), dataset_name,
-                       model_right.name + '_right', len(train_input_right.index), train_benchmark_right, test_benchmark_right])
+        result.append([dataset_name,
+                       model_right.name + '_right', idx, len(train_input_right.index), train_benchmark_right, test_benchmark_right])
 
         train_output_merged = get_merged_eyes_dataframe(train_input_right, train_output_right, train_input_left, train_output_left)
         test_output_merged = get_merged_eyes_dataframe(test_input_right, test_output_right, test_input_left, test_output_left)
@@ -143,15 +143,16 @@ def generate_predictions(dataset_name, filename, df):
         test_output_with_target = test_output_merged[['x_avg', 'y_avg']].join(test_target_merged[['rel_target_x', 'rel_target_y']]).dropna()
         train_benchmark_merged = model_right.evaluate(train_output_with_target[['x_avg', 'y_avg']].to_numpy(), train_output_with_target[['rel_target_x', 'rel_target_y']])
         test_benchmark_merged = model_right.evaluate(test_output_with_target[['x_avg', 'y_avg']].to_numpy(), test_output_with_target[['rel_target_x', 'rel_target_y']])
-        result.append([os.path.relpath(filename), dataset_name,
-                       model_right.name + '_eye_avg', len(train_output_merged.index), train_benchmark_merged,
+        result.append([dataset_name,
+                       model_right.name + '_eye_avg', idx, len(train_output_merged.index), train_benchmark_merged,
                        test_benchmark_merged])
 
         predictions_df = get_prediction_results(df, test_input, test_target, test_output, train_input, train_target,
                                                 train_output)
 
         predictions_df.insert(0, 'dataset', dataset_name)
-        predictions_df.insert(1, 'model', model.name)
+        predictions_df.insert(1, 'model_name', model.name)
+        predictions_df.insert(2, 'model_id', idx)
 
         predictions = predictions.append(predictions_df)
 
@@ -166,9 +167,10 @@ def get_prediction_results(df, test_input, test_target, test_output, train_input
     d2[['prediction_x', 'prediction_y']] = train_output
     d2[['target_x', 'target_y']] = train_target
     d2['type'] = 'train'
-    output_columns = ['frame', 'image_path', 'type', 'prediction_x', 'prediction_y', 'target_x', 'target_y']
+    output_columns = ['frame', 'raw_image', 'landmark_image', 'type', 'prediction_x', 'prediction_y', 'target_x', 'target_y']
     output_df= df.merge(d1.append(d2))
     return output_df[output_columns]
+
 
 def normalize_dims(ndarray):
     if len(np.shape(ndarray))>1:

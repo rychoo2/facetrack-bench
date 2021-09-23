@@ -27,7 +27,7 @@ class TestProcess_features(TestCase):
         for dataset in expected_datasets:
             output_df = pd.read_csv("{}/{}/features.csv".format(self.test_output_path, dataset))
             expected_df = pd.read_csv("{}/{}/features.csv".format(self.expected_output_path, dataset))
-            columns = ['image_path','raw_path','landmark_path','rel_target_x','rel_target_y','timestamp',
+            columns = ['raw_image','landmark_image','rel_target_x','rel_target_y','timestamp',
                        'frame','gaze_0_x', 'gaze_0_y', 'gaze_0_z', 'gaze_1_x', 'gaze_1_y', 'gaze_1_z',
                        'gaze_angle_x', 'gaze_angle_y', 'pose_Tx', 'pose_Ty', 'pose_Tz', 'pose_Rx', 'pose_Ry', 'pose_Rz']
 
