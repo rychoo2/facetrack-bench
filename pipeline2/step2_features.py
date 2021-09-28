@@ -20,7 +20,7 @@ def generate_features(raw_path, landmark_path, output_path):
     )
 
     df['landmark_image'] = df.apply(
-        lambda row: os.path.join(os.path.dirname(os.path.relpath(landmark_path)), f"images/frame_{row['frame']}.jpg" ),
+        lambda row: os.path.join(os.path.dirname(os.path.relpath(landmark_path)), row['landmark_image']),
         axis=1
     )
 

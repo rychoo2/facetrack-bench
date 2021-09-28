@@ -26,11 +26,28 @@ class TestProcess_landmarks(TestCase):
         for dataset in ['capture0', 'capture1', 'capture2']:
             output_df = pd.read_csv("{}/{}/landmarks.csv".format(self.test_output_path, dataset))
             expected_df = pd.read_csv("{}/{}/landmarks.csv".format(self.expected_output_path, dataset))
-            columns = ['frame','gaze_0_x', 'gaze_0_y', 'gaze_0_z', 'gaze_1_x', 'gaze_1_y', 'gaze_1_z', 'gaze_angle_x', 'gaze_angle_y']
+            columns = ['frame','gaze_0_x', 'gaze_0_y', 'gaze_0_z', 'gaze_1_x', 'gaze_1_y', 'gaze_1_z', 'gaze_angle_x', 'gaze_angle_y', "landmark_image"]
 
             assert_frame_equal(output_df[columns], expected_df[columns], atol=0.02)
 
-        self.assertEqual(len(os.listdir("{}/capture0/images".format(self.test_output_path))), 17)
+        self.assertEqual(set(os.listdir("{}/capture0/images".format(self.test_output_path))),
+         {'frame_6.jpg',
+          'frame_12.jpg',
+          'frame_13.jpg',
+          'frame_7.jpg',
+          'frame_5.jpg',
+          'frame_11.jpg',
+          'frame_10.jpg',
+          'frame_4.jpg',
+          'frame_14.jpg',
+          'frame_15.jpg',
+          'frame_1.jpg',
+          'frame_3.jpg',
+          'frame_17.jpg',
+          'frame_16.jpg',
+          'frame_2.jpg',
+          'frame_9.jpg',
+          'frame_8.jpg'})
         self.assertEqual(len(os.listdir("{}/capture1/images".format(self.test_output_path))), 33)
         self.assertEqual(len(os.listdir("{}/capture2/images".format(self.test_output_path))), 19)
 

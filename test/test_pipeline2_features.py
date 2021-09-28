@@ -31,7 +31,7 @@ class TestProcess_features(TestCase):
                        'frame','gaze_0_x', 'gaze_0_y', 'gaze_0_z', 'gaze_1_x', 'gaze_1_y', 'gaze_1_z',
                        'gaze_angle_x', 'gaze_angle_y', 'pose_Tx', 'pose_Ty', 'pose_Tz', 'pose_Rx', 'pose_Ry', 'pose_Rz']
 
-            assert_frame_equal(output_df[columns], expected_df[columns], atol=0.1)
+            assert_frame_equal(output_df[columns], expected_df[columns], atol=0.3)
             print(f"Dataset {dataset} correct")
 
         # should be 'quick'

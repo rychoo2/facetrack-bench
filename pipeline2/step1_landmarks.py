@@ -3,6 +3,7 @@ from libs.utils import get_timestamp, get_datasets
 import subprocess
 import cv2
 import shutil
+import pandas as pd
 
 train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data2"
 output_path = "{}/landmarks/{}".format(train_data_dir,  get_timestamp())
@@ -21,20 +22,29 @@ def run_openface_feature_extraction(input_path, output_path):
     shutil.move(openface_output_path+"/images", output_path)
     landmarks_csv = openface_output_path+"/images.csv"
 
-    shutil.move(landmarks_csv, output_path+"/landmarks.csv")
+    df = pd.read_csv(landmarks_csv)
+
+    df.insert(1, 'landmark_image', df.apply(
+        lambda row: image_filename(row['frame']),
+        axis=1)
+    )
+
+    df.to_csv(output_path+"/landmarks.csv", index=False)
 
 
 def extract_images_from_video(videofile):
-    output_path = os.path.dirname(videofile) + "/images"
-    os.makedirs(output_path)
+    output_path = os.path.dirname(videofile)
+    os.makedirs(output_path + "/images")
     vidcap = cv2.VideoCapture(videofile)
     success, image = vidcap.read()
-    count = 0
+    count = 1
     while success:
-        cv2.imwrite(output_path + "/frame_%d.jpg" % count, image)  # save frame as JPEG file
+        cv2.imwrite(os.path.join(output_path, image_filename(count)), image)  # save frame as JPEG file
         success, image = vidcap.read()
         count+=1
 
+def image_filename(frame):
+    return f"images/frame_{int(frame):d}.jpg"
 
 def generate_landmarks_for_datasets(input_root, output_root):
     path, datasets = get_datasets(input_root)
