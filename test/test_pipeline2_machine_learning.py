@@ -31,7 +31,7 @@ class TestPrediction_models(TestCase):
 
         expected_df = pd.read_csv("{}/models_predictions.csv".format(self.expected_output_path))
 
-        assert_frame_equal(output_df, expected_df, atol=0.9)
+        assert_frame_equal(output_df, expected_df, atol=0.9, check_like=True)
 
         # should be 'quick'
         print("took {} cpu time".format(duration))
@@ -40,9 +40,9 @@ class TestPrediction_models(TestCase):
 
     def test_drawing_predictions(self):
         generate_predictions_for_datasets("data/pipeline2", self.test_output_path)
-        predictions_csv = "{}/models_predictions.csv".format(self.test_output_path)
+        predictions_csv_path = "{}/models_predictions.csv".format(self.test_output_path)
         from libs.prediction_markers import draw_prediction_markers
-        draw_prediction_markers(predictions_csv)
+        draw_prediction_markers(predictions_csv_path)
 
         self.assertEqual(set(os.listdir("{}/capture0/images".format(self.test_output_path))),
                          {'frame_6.jpg',
