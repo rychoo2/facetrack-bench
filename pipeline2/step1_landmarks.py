@@ -16,6 +16,7 @@ def run_openface_feature_extraction(input_path, output_path):
         openface_bin_path +"/FeatureExtraction",
         "-verbose",
         "-fdir", input_path + "/images",
+        "-oc H264",
         "-out_dir", openface_output_path
     ])
     extract_images_from_video(openface_output_path + "/images.avi")
