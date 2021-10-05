@@ -2,11 +2,13 @@ import os
 import pandas as pd
 from .draw_utils import place_markers_on_images
 
-input_path = "../test/tmp/pipeline2/machine_learning/1/models_predictions.csv"
+csv_path = "tmp/pipeline2/machine_learning/1/models_predictions.csv"
+root_path = "../test"
 
 
-def prepare_data_from_predictions_csv(csv_path):
-    df = pd.read_csv(csv_path)
+def prepare_data_from_predictions_csv(input_root_path, csv_path):
+    full_path=os.path.join(input_root_path,csv_path)
+    df = pd.read_csv(full_path)
     df = df[~df['dataset'].str.startswith('overall')]  # drop rows which starts with overall...
     unique_files = df['landmark_image'].unique()  # find unique image filenames
     data = []
@@ -28,18 +30,18 @@ def prepare_data_from_predictions_csv(csv_path):
                 "y": row.prediction_y
             })
         img_predictions_data = {
-            "img_path": f"../test/{u_file}",
+            "img_path": f"{input_root_path}/{u_file}",
             "markers": markers
         }
         data.append(img_predictions_data)
     return data
 
 
-def draw_prediction_markers(csv_path):
+def draw_prediction_markers(input_root_path, csv_path):
     output_path = os.path.dirname(os.path.relpath(csv_path))
-    data = prepare_data_from_predictions_csv(csv_path)
-    place_markers_on_images(data, output_path)
+    data = prepare_data_from_predictions_csv(input_root_path, csv_path)
+    place_markers_on_images(input_root_path, data, output_path)
 
 
 if __name__ == '__main__':
-    draw_prediction_markers(input_path)
+    draw_prediction_markers(root_path, csv_path)
