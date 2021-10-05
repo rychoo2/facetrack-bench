@@ -3,6 +3,7 @@ from unittest import TestCase
 from pipeline2.step3_machine_learning import generate_predictions_for_datasets
 
 import time
+import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal
 import os
@@ -31,11 +32,16 @@ class TestPrediction_models(TestCase):
 
         expected_df = pd.read_csv("{}/models_predictions.csv".format(self.expected_output_path))
 
-        assert_frame_equal(output_df, expected_df, atol=0.9, check_like=True)
+        assert_frame_equal(self.sort_df(output_df), self.sort_df(expected_df), atol=0.9, check_like=True)
 
         # should be 'quick'
         print("took {} cpu time".format(duration))
         self.assertLess(duration, 150)
+
+
+    @staticmethod
+    def sort_df(df):
+        return pd.DataFrame(np.sort(df.values, axis=0), index=df.index, columns=df.columns)
 
 
     def test_drawing_predictions(self):
