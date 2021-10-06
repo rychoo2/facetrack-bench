@@ -53,7 +53,7 @@ points_iterator = iter(pts)
 
 cam = cv2.VideoCapture(0)
 now = get_timestamp()
-output = './data/raw/{}'.format(now)
+output = './train_data2/raw/{}'.format(now)
 os.makedirs(output+'/images')
 fw = open('{}/positions.csv'.format(output), 'w')
 fw.write("frame,timestamp,x,y,screen_width,screen_height,image_path,image_width,image_height\n")
