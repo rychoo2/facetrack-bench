@@ -11,9 +11,7 @@ import datetime
 from libs.face import get_face, generate_landmark_image
 from libs.utils import get_timestamp, target_columns, training_columns
 from tkinter import Tk
-from pipeline.models.extra_trees_regressor import ExtraTreesRegressor
-from pipeline.step1_landmarks import create_landmarks_row, create_landmarks_header
-from pipeline.step3_features import include_output_features_dlib
+from pipeline2.models.extra_trees_regressor import ExtraTreesRegressor
 from pynput.mouse import Button, Controller
 mouse = Controller()
 
@@ -24,7 +22,7 @@ screen_height = root.winfo_screenheight()
 
 cam = cv2.VideoCapture(0)
 
-training_features_path = os.path.dirname(os.path.realpath(__file__)) + "/../train_data2/features/20200124181140939/20200124175712535_opencv/features.csv"
+training_features_path = os.path.dirname(os.path.realpath(__file__)) + "/../train_data2/features/20211016213607083/20211016211320483/features.csv"
 features_func = include_output_features_dlib
 
 def load_training_data():

@@ -5,7 +5,7 @@ import numpy
 import math
 from libs.utils import get_timestamp
 
-n = 5
+n = 100
 radius = 2.5
 
 # A Halton sequence is a sequence of points within a unit dim-cube which

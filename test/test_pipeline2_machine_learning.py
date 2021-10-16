@@ -47,7 +47,7 @@ class TestPrediction_models(TestCase):
     def test_drawing_predictions(self):
         generate_predictions_for_datasets("data/pipeline2", self.test_output_path)
         predictions_csv_path = "{}/models_predictions.csv".format(self.test_output_path)
-        input_root_path = "../test"
+        input_root_path = "."
         from libs.prediction_markers import draw_prediction_markers
         draw_prediction_markers(input_root_path, predictions_csv_path)
 

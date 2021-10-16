@@ -24,6 +24,8 @@ def generate_features(raw_path, landmark_path, output_path):
         axis=1
     )
 
+    df = df[df.confidence > 0.9]
+
     # features_calculation(df)
     include_target_features(df)
 
