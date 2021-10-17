@@ -7,11 +7,13 @@ import pandas as pd
 
 train_data_dir = os.path.dirname(os.path.realpath(__file__)) + "/../train_data2"
 output_path = "{}/landmarks/{}".format(train_data_dir,  get_timestamp())
-openface_bin_path = "/Users/juliusz/Sources/OpenFace/build/bin"
+openface_bin_path = os.environ.get('OPENFACE_BIN_PATH')
 
 
 def run_openface_feature_extraction(input_path, output_path):
     openface_output_path = output_path + "/openface"
+
+
     subprocess.check_call([
         openface_bin_path +"/FeatureExtraction",
         "-verbose",
