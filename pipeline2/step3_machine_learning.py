@@ -15,6 +15,7 @@ from pipeline.models import CenterOfScreenModel #, NNSequentialKerasBasic, NNSeq
 # ExtraTreeRegressor
 
 from pipeline.models.sklearn_model_base import SklrearnModelBase
+from libs.prediction_markers import draw_prediction_markers
 
 pd.options.display.float_format = "{:.4f}".format
 
@@ -34,7 +35,7 @@ training_columns = ['gaze_0_x', 'gaze_0_y', 'gaze_0_z', 'gaze_1_x', 'gaze_1_y', 
                     'pose_Tx', 'pose_Ty', 'pose_Tz',]
 target_columns = ['rel_target_x', 'rel_target_y']
 
-def generate_predictions_for_datasets(input_path, output_path):
+def generate_predictions_for_datasets(input_path, output_path, visual_debug=False):
     benchmark_result = []
     predictions_df = pd.DataFrame()
     os.makedirs(output_path)
@@ -62,8 +63,9 @@ def generate_predictions_for_datasets(input_path, output_path):
 
     benchmarks_df = pd.DataFrame(benchmark_result)
 
+    predictions_csv_path = "{}/models_predictions.csv".format(output_path)
     predictions_df.to_csv(
-        "{}/models_predictions.csv".format(output_path),
+        predictions_csv_path,
         index=False)
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
         print(benchmarks_df.drop(benchmarks_df.columns[0], axis=1))
@@ -73,6 +75,8 @@ def generate_predictions_for_datasets(input_path, output_path):
             index=False)
 
 
+    if visual_debug:
+        draw_prediction_markers(predictions_csv_path)
 
     return benchmark_result
 

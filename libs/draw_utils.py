@@ -36,11 +36,11 @@ def draw_markers_on_img(marker):
     return img
 
 
-def place_markers_on_images(input_path, data, output_path):
+def place_markers_on_images(data, output_path):
     # if not os.path.exists(output_path):
     #     os.makedirs(output_path)
     for entry in data:
-        img_dir = "{}/{}/{}/{}".format(input_path, output_path, entry["img_path"].split("/")[-3], "images")
+        img_dir = "{}/{}/{}".format(output_path, entry["img_path"].split("/")[-3], "images")
         if not os.path.exists(img_dir):
             os.makedirs(img_dir)
         img_file = entry["img_path"].split('/')[-1]
