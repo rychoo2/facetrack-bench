@@ -5,14 +5,14 @@ from libs.utils import get_timestamp, points
 
 
 class Capture:
-    def __init__(self, master, n, output_path):
-        self.master = master
+    def __init__(self, n, output_path):
+        self.master = tk.Tk()
         self.screen_width = self.master.winfo_screenwidth()
         self.screen_height = self.master.winfo_screenheight()
         self.master.state('zoomed')
         self.master.attributes('-fullscreen', True)
         self.master.bind('<Escape>', self.close)
-        self.canvas = tk.Canvas(master, bg='black', highlightthickness=0)
+        self.canvas = tk.Canvas(self.master, bg='black', highlightthickness=0)
         self.canvas.pack(fill=tk.BOTH, expand=True)
         self.points = points(n, self.screen_width, self.screen_height)
         self.counter = tk.IntVar(value=0)
@@ -27,7 +27,10 @@ class Capture:
         self.fw = open('{}/positions.csv'.format(self.output), 'w')
         self.fw.write(
             "frame,timestamp,x,y,screen_width,screen_height,image_path,image_width,image_height\n")
+
+    def run(self):
         self.update_point()
+        self.master.mainloop()
 
     def capture_frame(self, event):
         frame = self.counter.get() + 1
@@ -42,6 +45,7 @@ class Capture:
                                                             img_height))
         self.fw.flush()
         cv2.imwrite("{}/{}".format(self.output, image_path), img)
+        self.increment_counter()
 
     def circle(self, x, y, radius, color="yellow"):
         x0 = x - radius
@@ -68,17 +72,15 @@ class Capture:
         self.circle(point_x, point_y, self.radius, self.point_color)
         self.canvas.tag_bind("circle", "<1>", self.capture_frame)
 
-        self.increment_counter()
-
     def close(self, *args):
         self.cam.release()
         self.canvas.delete(self.info_text)
         self.master.destroy()
+        self.fw.close()
 
 
 if __name__ == "__main__":
     n = 3
     output = '../train_data2'
-    root = tk.Tk()
-    capture = Capture(root, n, output)
-    root.mainloop()
+    capture = Capture(n, output)
+    capture.run()
