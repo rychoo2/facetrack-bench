@@ -1,6 +1,6 @@
 import shutil
 from unittest import TestCase
-from pipeline2.step1_landmarks import generate_landmarks_for_datasets, run_openface_feature_extraction_live
+from pipeline2.step1_landmarks import generate_landmarks_for_datasets, run_live_openface_feature_extraction
 import os
 import time
 import pandas as pd
@@ -59,7 +59,7 @@ class TestProcess_landmarks(TestCase):
     def test_generate_landmarks_live(self):
         shutil.rmtree(self.test_output_path, ignore_errors=True, onerror=None)
         i = 10
-        for landmarks in run_openface_feature_extraction_live(self.test_output_path):
+        for landmarks in run_live_openface_feature_extraction(self.test_output_path):
             print(landmarks)
             self.assertIsNotNone(landmarks)
             i-=1

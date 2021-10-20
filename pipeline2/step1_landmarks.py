@@ -10,7 +10,7 @@ output_path = "{}/landmarks/{}".format(train_data_dir,  get_timestamp())
 openface_bin_path = os.environ.get('OPENFACE_BIN_PATH')
 
 
-def run_openface_feature_extraction_live(output_path):
+def run_live_openface_feature_extraction(output_path):
     openface_output_path = output_path + "/openface"
 
     ## 1. Execute the process in the background, below is the foreground version
