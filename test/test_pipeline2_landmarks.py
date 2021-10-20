@@ -1,6 +1,6 @@
 import shutil
 from unittest import TestCase
-from pipeline2.step1_landmarks import generate_landmarks_for_datasets
+from pipeline2.step1_landmarks import generate_landmarks_for_datasets, run_openface_feature_extraction_live
 import os
 import time
 import pandas as pd
@@ -54,6 +54,17 @@ class TestProcess_landmarks(TestCase):
         # should be 'quick'
         print("took {} cpu time".format(duration))
         self.assertLess(duration, 300)
+
+
+    def test_generate_landmarks_live(self):
+        shutil.rmtree(self.test_output_path, ignore_errors=True, onerror=None)
+        i = 10
+        for landmarks in run_openface_feature_extraction_live(self.test_output_path):
+            print(landmarks)
+            self.assertIsNotNone(landmarks)
+            i-=1
+            if i < 0:
+                break
 
 
     def readfile(self, path):
