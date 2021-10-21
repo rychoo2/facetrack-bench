@@ -44,7 +44,7 @@ def run_live_openface_feature_extraction(output_path):
                 f.seek(-2, os.SEEK_END)
                 while f.read(1) != b'\n':
                     f.seek(-2, os.SEEK_CUR)
-                landmarks = f.readline().decode().split(',')
+                landmarks = f.readline().decode().rstrip().split(',')
                 last_frame = int(landmarks[0])
                 if last_frame > frame and len(header_names) == len(landmarks):
                     landmarks_dict = dict(zip(header_names, landmarks))
