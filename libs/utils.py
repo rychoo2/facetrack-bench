@@ -32,6 +32,26 @@ def list_dirs(path):
     return [x for x in os.listdir(path) if not '.DS_Store' in x]
 
 
+def read_file_last_nlines(file, nlines):
+    with open(file,"rb") as f:
+        f.seek(0, os.SEEK_END)
+        endf = position = f.tell()
+        linecnt = 0
+        while position >= 0:
+            f.seek(position)
+            next_char = f.read(1)
+            if next_char == b"\n" and position != endf - 1:
+                linecnt += 1
+            if linecnt == nlines:
+                break
+            position -= 1
+
+        if position < 0:
+            f.seek(0)
+
+        return [line.rstrip() for line in f.read().decode().split('\n')]
+
+
 # A Halton sequence is a sequence of points within a unit dim-cube which
 # have low discrepancy (that is, they appear to be randomish but cover
 # the domain uniformly)

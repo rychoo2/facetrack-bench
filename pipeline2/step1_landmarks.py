@@ -2,7 +2,7 @@ import csv
 import glob
 import os
 import time
-from libs.utils import get_timestamp, get_datasets
+from libs.utils import get_timestamp, get_datasets, read_file_last_nlines
 import subprocess
 import cv2
 import shutil
@@ -39,20 +39,31 @@ def run_live_openface_feature_extraction(output_path):
     try:
         while True:
             landmarks_lines = read_file_last_nlines(csv_file, 2)
+
             if len(landmarks_lines[1]) == len(header_names):
-                landmarks = landmarks_lines[1]
+                landmarks = landmarks_lines[1].split(',')
             else:
-                landmarks = landmarks_lines[0]
+                landmarks = landmarks_lines[0].split(',')
                 print("last line not full")
+
+            if landmarks == header_names:
+                print("no output ready yet")
+                continue
+
             last_frame = int(landmarks[0])
             if last_frame > frame:
                 landmarks_dict = dict(zip(header_names, landmarks))
                 frame = last_frame
                 yield landmarks_dict
+                time.sleep(0.01)
 
     except GeneratorExit:
-        process.terminate()
-        process.wait()
+        try:
+            process.terminate()
+            process.wait()
+        except Exception as e:
+            print(e)
+            raise
         print("finished")
         raise
 
@@ -92,25 +103,6 @@ def extract_images_from_video(videofile):
         success, image = vidcap.read()
         count += 1
 
-
-def read_file_last_nlines(file, nlines):
-    with open(file,"rb") as f:
-        f.seek(0, os.SEEK_END)
-        endf = position = f.tell()
-        linecnt = 0
-        while position >= 0:
-            f.seek(position)
-            next_char = f.read(1)
-            if next_char == b"\n" and position != endf - 1:
-                linecnt += 1
-            if linecnt == nlines:
-                break
-            position -= 1
-
-        if position < 0:
-            f.seek(0)
-
-        return [line.rstrip().split(',') for line in f.read().decode().split('\n')]
 
 
 def image_filename(frame):
