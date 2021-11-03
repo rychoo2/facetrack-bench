@@ -46,6 +46,7 @@ def run_live_openface_feature_extraction(output_path):
                 landmarks = landmarks_lines[0].split(',')
                 print("last line not full")
 
+            print(landmarks, header_names)
             if landmarks == header_names:
                 print("no output ready yet")
                 continue
@@ -55,17 +56,14 @@ def run_live_openface_feature_extraction(output_path):
                 landmarks_dict = dict(zip(header_names, landmarks))
                 frame = last_frame
                 yield landmarks_dict
-                time.sleep(0.01)
+                # time.sleep(0.01)
 
     except GeneratorExit:
-        try:
-            process.terminate()
-            process.wait()
-        except Exception as e:
-            print(e)
-            raise
-        print("finished")
         raise
+    finally:
+        print("finished")
+        process.terminate()
+        process.wait()
 
 
 def run_openface_feature_extraction(input_path, output_path):
