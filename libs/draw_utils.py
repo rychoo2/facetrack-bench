@@ -43,7 +43,8 @@ def place_markers_on_images(data, output_path):
         img_dir = "{}/{}/{}".format(output_path, entry["img_path"].split("/")[-3], "images")
         if not os.path.exists(img_dir):
             os.makedirs(img_dir)
-        img_file = entry["img_path"].split('/')[-1]
         img = draw_markers_on_img(entry)
-        cv2.imwrite(f"{img_dir}/{img_file}", img)
+        img_file = entry["img_path"].split('/')[-1]
+        img_prefix=entry['output_prefix']
+        cv2.imwrite(f"{img_dir}/{img_prefix}_{img_file}", img)
         cv2.destroyAllWindows()

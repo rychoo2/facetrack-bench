@@ -8,8 +8,7 @@ root_path = "../test"
 
 def prepare_data_from_predictions_csv(csv_path):
     df = pd.read_csv(csv_path)
-    df = df[~df['dataset'].str.startswith('overall')]  # drop rows which starts with overall...
-    unique_files = df['landmark_image'].unique()  # find unique image filenames
+    unique_files: list[str] = df['landmark_image'].unique()  # find unique image filenames
     data = []
     for u_file in unique_files:  # prepare data for drawing function
         u_file_df = df.loc[df["landmark_image"] == u_file]
@@ -29,7 +28,8 @@ def prepare_data_from_predictions_csv(csv_path):
                 "y": row.prediction_y
             })
         img_predictions_data = {
-            "img_path": f"{u_file}",
+            "img_path": u_file,
+            "output_prefix": row.type,
             "markers": markers
         }
         data.append(img_predictions_data)

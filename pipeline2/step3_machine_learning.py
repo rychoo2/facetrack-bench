@@ -57,7 +57,6 @@ def generate_predictions_for_datasets(input_path, output_path, visual_debug=Fals
         predictions_csv_path,
         index=False)
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
-        print(benchmarks_df.drop(benchmarks_df.columns[0], axis=1))
         benchmarks_df.to_csv(
         "{}/models_benchmark.csv".format(output_path),
             header=['dataset', 'model_name', 'model_id', 'count', 'train_score', 'test_score'],
