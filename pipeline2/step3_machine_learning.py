@@ -38,26 +38,15 @@ target_columns = ['rel_target_x', 'rel_target_y']
 def generate_predictions_for_datasets(input_path, output_path, visual_debug=False):
     benchmark_result = []
     predictions_df = pd.DataFrame()
-    os.makedirs(output_path)
-    overall = pd.DataFrame()
-    overall_groups = collections.defaultdict(pd.DataFrame)
+    os.makedirs(output_path, exist_ok=True)
 
     features_path, datasets = get_latest_features(input_path)
 
-    dataset_groups = get_dataset_groups(datasets)
 
     for dataset in datasets:
         dataset_features_path = "{}/{}/features.csv".format(features_path, dataset)
-        data = pd.read_csv(dataset_features_path)
-        overall = overall.append(data, ignore_index=True)
-        overall_groups[dataset_groups[dataset]] = overall_groups[dataset_groups[dataset]].append(data, ignore_index=True)
 
-        benchmark, predictions = generate_predictions(dataset, dataset_features_path, data)
-        predictions_df = predictions_df.append(predictions)
-        benchmark_result += benchmark
-
-    for grp, df in overall_groups.items():
-        benchmark, predictions =  generate_predictions('overall_{}'.format(grp), features_path, df)
+        benchmark, predictions = generate_predictions(dataset, dataset_features_path)
         predictions_df = predictions_df.append(predictions)
         benchmark_result += benchmark
 
@@ -78,8 +67,18 @@ def generate_predictions_for_datasets(input_path, output_path, visual_debug=Fals
     if visual_debug:
         draw_prediction_markers(predictions_csv_path)
 
-    return benchmark_result
+    return select_best_model(benchmark_result)
 
+def select_best_model(benchmark_result):
+
+    model_name, error = None, 1.0
+
+    for dataset, model, _, _, train, test in benchmark_result:
+        if test[0] < error:
+            error = test[0]
+            model_name = model
+
+    return model_name, error
 
 def get_dataset_groups(datasets):
     d = dict()
@@ -89,7 +88,8 @@ def get_dataset_groups(datasets):
 
     return d
 
-def generate_predictions(dataset_name, filename, df):
+def generate_predictions(dataset_name, filename):
+    df = pd.read_csv(filename)
     result = []
     predictions = pd.DataFrame()
     train_input, train_target, test_input, test_target = prepare_dataframe(df)

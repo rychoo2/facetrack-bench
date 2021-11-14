@@ -21,7 +21,7 @@ screen_height = root.winfo_screenheight()
 
 
 def load_training_data():
-    last_calibrate = get_latest(calibrate_path, )
+    last_calibrate = get_latest(calibrate_path, "")
     df = pd.read_csv(os.path.join(last_calibrate, "features.csv"))
 
     return df

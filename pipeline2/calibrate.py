@@ -1,6 +1,6 @@
-from capturing_user_input_data import Capture
-from step1_landmarks import run_openface_feature_extraction
-from step2_features import generate_features
+from pipeline2.capturing_user_input_data import Capture
+from pipeline2.step1_landmarks import run_openface_feature_extraction
+from pipeline2.step2_features import generate_features
 
 calibrate_path = '../train_data2/calibration'
 
