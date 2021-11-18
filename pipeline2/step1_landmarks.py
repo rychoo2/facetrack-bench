@@ -47,7 +47,7 @@ def run_live_openface_feature_extraction(output_path):
                 print("last line not full")
 
             print(landmarks, header_names)
-            if landmarks == header_names:
+            if not landmarks[0].isnumeric():
                 print("no output ready yet")
                 continue
 
