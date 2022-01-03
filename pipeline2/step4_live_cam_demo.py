@@ -62,8 +62,13 @@ def predict_live(model):
 def main():
     model = train_model()
     for prediction in predict_live(model):
-        draw_circle(prediction[0] * screen_width, prediction[1] * screen_height)
+        update_circle(prediction[0] * screen_width, prediction[1] * screen_height)
         root.update()
+
+
+def update_circle(x, y):
+    canvas.delete("circle")
+    draw_circle(x, y, radius=radius)
 
 
 def draw_circle(x, y, radius=radius, color="red"):
