@@ -1,5 +1,4 @@
 import tkinter as tk
-import cv2
 import pandas as pd
 import os
 from sklearn import ensemble
@@ -14,7 +13,6 @@ from libs.utils import get_timestamp
 
 root = tk.Tk()
 screen_width = root.winfo_screenwidth()
-# screen_width = 2440
 screen_height = root.winfo_screenheight()
 root.state('zoomed')
 root.attributes('-fullscreen', True)
@@ -22,13 +20,16 @@ root.attributes('-fullscreen', True)
 canvas = tk.Canvas(root, bg='black', highlightthickness=0)
 canvas.pack(fill=tk.BOTH, expand=True)
 radius = 2.5
+demo_on = True
 
 
-def close(*args):
-    root.destroy()
+def on_close(*args):
+    global demo_on
+    demo_on = False
+    root.after(100, root.destroy)
 
 
-root.bind('<Escape>', close)
+root.bind('<Escape>', on_close)
 
 
 def load_training_data():
@@ -62,7 +63,10 @@ def predict_live(model):
 def main():
     model = train_model()
     for prediction in predict_live(model):
+        if not demo_on:
+            return
         update_circle(prediction[0] * screen_width, prediction[1] * screen_height)
+        root.update_idletasks()
         root.update()
 
 
